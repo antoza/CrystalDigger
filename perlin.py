@@ -35,10 +35,15 @@ class Perlin2d:
         # Initialize the random array with unit vectors
         self.size = n
         random.seed(seed)
-        self.grad = [[0 for _ in range(n)] for _ in range(n)]
-        for i in range(n):
-            for j in range(n):
-                self.grad[i][j] = unit_vect(2)
+
+        if n == 2:
+            cst = 1/sqrt(2)
+            self.grad = [[[cst, cst], [cst, cst]], [[cst, cst], [cst, cst]]]
+        else:
+            self.grad = [[[] for _ in range(n)] for _ in range(n)]
+            for i in range(n):
+                for j in range(n):
+                    self.grad[i][j] = unit_vect(2)
 
     def noise(self, x, y):
         bounded_x = x - int(x)
@@ -99,10 +104,10 @@ class Perlin1d:
         return interpolate(self.grad[index] * dist_node1, self.grad[index + 1] * dist_node2, c)
 
 
-def main(dim=2):
+def main(dim=2, seed=0):
 
     if dim == 1:
-        perlin = Perlin1d(n=4)
+        perlin = Perlin1d(n=4, seed=seed)
 
         n_max = 100
         result = [0 for _ in range(n_max)]
@@ -122,7 +127,7 @@ def main(dim=2):
         plt.show()
 
     else:
-        perlin = Perlin2d(n=16)
+        perlin = Perlin2d(n=2, seed=seed)
 
         n_max = 200
         image = [[0 for _ in range(n_max)] for _ in range(n_max)]
@@ -131,7 +136,7 @@ def main(dim=2):
 
         for p in range(4):
             freq_factor = 2 ** p
-            amp_factor = 1 / (2 ** p)
+            amp_factor = 1 / (2 ** (p*p))
             for i in range(n_max):
                 for j in range(n_max):
                     x = freq_factor * f * step * i
