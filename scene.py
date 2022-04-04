@@ -32,7 +32,7 @@ def generate_scene(shader):
     # adding the floor
     n_x = 10
     n_y = 10
-    scene.add(Surface(shader, amp=0, n_x=n_x, n_y=n_y))
+    scene.add(Surface(shader, amp=.1, n_x=n_x, n_y=n_y))
 
     upper_walls = generate_walls(shader, n_x=n_x, n_y=n_y)
     right_walls = generate_walls(shader, n_x=n_x, n_y=n_y, rotation=rotate((0, 0, 1), -90))
