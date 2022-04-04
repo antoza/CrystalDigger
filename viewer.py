@@ -9,38 +9,7 @@ from texture import Texture, Textured
 from perlin import Perlin2d
 
 
-# -------------- Example textured plane class ---------------------------------
-class TexturedPlane(Textured):
-    """ Simple first textured object """
-
-    def __init__(self, shader, tex_files):
-        # prepare texture modes cycling variables for interactive toggling
-        self.wraps = cycle([GL.GL_REPEAT, GL.GL_MIRRORED_REPEAT,
-                            GL.GL_CLAMP_TO_BORDER, GL.GL_CLAMP_TO_EDGE])
-        self.filters = cycle([(GL.GL_NEAREST, GL.GL_NEAREST),
-                              (GL.GL_LINEAR, GL.GL_LINEAR),
-                              (GL.GL_LINEAR, GL.GL_LINEAR_MIPMAP_LINEAR)])
-        self.wrap, self.filter = next(self.wraps), next(self.filters)
-        self.files = tex_files
-
-        # setup plane mesh to be textured
-        base_coords = ((-1, -1, 0), (1, -1, 0), (1, 1, 0), (-1, 1, 0))
-        scaled = 100 * np.array(base_coords, np.float32)
-        indices = np.array((0, 1, 2, 0, 2, 3), np.uint32)
-        mesh = Mesh(shader, attributes=dict(position=scaled), index=indices)
-
-        # setup & upload texture to GPU, bind it to shader name 'diffuse_map'
-        texture = Texture(tex_files, self.wrap, *self.filter)
-        super().__init__(mesh, diffuse_map=texture)
-
-    def key_handler(self, key):
-        # cycle through texture modes on keypress of F6 (wrap) or F7 (filtering)
-        self.wrap = next(self.wraps) if key == glfw.KEY_F6 else self.wrap
-        self.filter = next(self.filters) if key == glfw.KEY_F7 else self.filter
-        if key in (glfw.KEY_F6, glfw.KEY_F7):
-            texture = Texture(self.files, self.wrap, *self.filter)
-            self.textures.update(diffuse_map=texture)
-
+# -------------- Notre petit jeu fait maison :) ---------------------------------
 
 class Floor(Textured):
 
@@ -59,6 +28,7 @@ class Floor(Textured):
         f = 2.5
 
         vert = []
+        normals = []
         indices = []
         amp = 1
         n_x = 30  # number of squares x-axis
@@ -67,8 +37,10 @@ class Floor(Textured):
         off_y = n_y / 2
         for j in range(n_y+1):
             for i in range(n_x+1):
-                # vertices
+                # vertices of the first triangle
                 vert.append((i - off_x, j - off_y, amp * perlin.noise(f * i, f * j)))
+
+                # vertices of the second triangle
 
         for j in range(n_y):
             for i in range(n_x):
@@ -83,9 +55,12 @@ class Floor(Textured):
                 indices.append(i + 1 + (n_x + 1) * (j+1))
 
         self.vert = np.array(vert)
+        self.normals = np.array(normals)
         self.indices = np.array(indices)
 
-        mesh = Mesh(shader, attributes=dict(position=self.vert), index=self.indices)
+        unif = dict({"k_a": (.25, .21, .21), "k_d": (1, .83, .83), "k_s": (.3, .3, .3), "s": .088, "light_dir": (0, 0, -1)})
+
+        mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals), index=self.indices, uniforms=unif)
 
         # setup & upload texture to GPU, bind it to shader name 'diffuse_map'
         texture1 = Texture(tex, self.wrap, *self.filter)
@@ -107,9 +82,9 @@ def main():
     viewer = Viewer()
     shader = Shader("texture.vert", "texture.frag")
 
-    light_dir = (2, 1, 3)
+    light_dir = (0, 0, -1)
     viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file, shader, light_dir=light_dir)])
-    viewer.add(Floor(shader, "grass.png"))
+    viewer.add(Floor(shader, "stone.png"))
 
     # start rendering loop
     viewer.run()

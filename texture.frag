@@ -28,10 +28,9 @@ void main() {
     vec3 r = reflect(-l, n);
     vec3 v = normalize(w_camera_position - w_position);
 
-    vec4 phong = vec4(k_a + k_d * max(0, dot(n, l)) + k_s * pow(max(0, dot(r, v)), s), 1);
-    // phong n'est pas utilisé pour l'instant ! (on s'en servira sans-doute plus tard)
+    vec4 phong = vec4(k_a + k_d * max(0, dot(n, l)) + k_s * pow(max(0, dot(r, v)), s*128), 1);
     vec4 color = texture(diffuse_map, frag_tex_coords);
     vec4 color2 = texture(second_texture, frag_tex_coords);
 
-    out_color = color; // + color2;
+    out_color = color;
 }
