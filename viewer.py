@@ -35,29 +35,42 @@ class Floor(Textured):
         n_y = 30  # number of squares y-axis
         off_x = n_x / 2
         off_y = n_y / 2
-        for j in range(n_y+1):
-            for i in range(n_x+1):
-                # vertices of the first triangle
-                vert.append((i - off_x, j - off_y, amp * perlin.noise(f * i, f * j)))
-
-                # vertices of the second triangle
-
         for j in range(n_y):
             for i in range(n_x):
-                # first triangle
-                indices.append(i + (n_x + 1) * j)
-                indices.append(i + 1 + (n_x + 1) * j)
-                indices.append(i + (n_x + 1) * (j + 1))
+                # heights of the (possibly) duplicated vertices
+                z1 = amp * perlin.noise(f * i, f * j)
+                z2 = amp * perlin.noise(f * (i + 1), f * j)
+                z3 = amp * perlin.noise(f * i, f * (j+1))
+                z4 = amp * perlin.noise(f * (i+1), f * (j+1))
 
-                # second triangle
-                indices.append(i + (n_x + 1) * (j + 1))
-                indices.append(i + 1 + (n_x + 1) * j)
-                indices.append(i + 1 + (n_x + 1) * (j+1))
+                # vertices of the first triangle
+                vert.append((i - off_x, j - off_y, z1))
+                vert.append((i + 1 - off_x, j - off_y, z2))
+                vert.append((i - off_x, j + 1 - off_y, z3))
+
+                # vertices of the second triangle
+                vert.append((i + 1 - off_x, j - off_y, z2))
+                vert.append((i + 1 - off_x, j + 1 - off_y, z4))
+                vert.append((i - off_x, j + 1 - off_y, z3))
+
+                # normals of the first triangle
+                normal1 = [1, 1, z2 + z3 - 2*z1]
+                normal2 = [1, 1, z4 + z2 - 2*z3]
+                normals.append(normal1)
+                normals.append(normal1)
+                normals.append(normal1)
+                normals.append(normal2)
+                normals.append(normal2)
+                normals.append(normal2)
+
+        for n in range(6 * n_x * n_y):
+            indices.append(n)
 
         self.vert = np.array(vert)
         self.normals = np.array(normals)
         self.indices = np.array(indices)
 
+        # Defining the material and the light_direction
         unif = dict({"k_a": (.25, .21, .21), "k_d": (1, .83, .83), "k_s": (.3, .3, .3), "s": .088, "light_dir": (0, 0, -1)})
 
         mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals), index=self.indices, uniforms=unif)

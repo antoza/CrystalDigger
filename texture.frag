@@ -32,5 +32,5 @@ void main() {
     vec4 color = texture(diffuse_map, frag_tex_coords);
     vec4 color2 = texture(second_texture, frag_tex_coords);
 
-    out_color = color;
+    out_color = phong;
 }
