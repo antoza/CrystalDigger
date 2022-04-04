@@ -13,7 +13,7 @@ from perlin import Perlin2d
 
 class Floor(Textured):
 
-    def __init__(self, shader, tex):
+    def __init__(self, shader, tex=None):
         perlin = Perlin2d()
 
         # prepare texture modes cycling variables for interactive toggling
@@ -23,9 +23,9 @@ class Floor(Textured):
                               (GL.GL_LINEAR, GL.GL_LINEAR),
                               (GL.GL_LINEAR, GL.GL_LINEAR_MIPMAP_LINEAR)])
         self.wrap, self.filter = next(self.wraps), next(self.filters)
-        self.tex = tex
+        #self.tex = tex
 
-        f = 2.5
+        f = .1
 
         vert = []
         normals = []
@@ -38,10 +38,10 @@ class Floor(Textured):
         for j in range(n_y):
             for i in range(n_x):
                 # heights of the (possibly) duplicated vertices
-                z1 = amp * perlin.noise(f * i, f * j)
-                z2 = amp * perlin.noise(f * (i + 1), f * j)
-                z3 = amp * perlin.noise(f * i, f * (j+1))
-                z4 = amp * perlin.noise(f * (i+1), f * (j+1))
+                z1 = amp * perlin.noise(f * i, f * j) + amp * perlin.noise(2 * f * i, 2 * f * j)
+                z2 = amp * perlin.noise(f * (i + 1), f * j) + amp * perlin.noise(2 * f * (i+1), 2 * f * j)
+                z3 = amp * perlin.noise(f * i, f * (j+1)) + amp * perlin.noise(2 * f * i, 2 * f * (j+1))
+                z4 = amp * perlin.noise(f * (i+1), f * (j+1)) + amp * perlin.noise(2 * f * (i+1), 2 * f * (j+1))
 
                 # vertices of the first triangle
                 vert.append((i - off_x, j - off_y, z1))
@@ -71,14 +71,16 @@ class Floor(Textured):
         self.indices = np.array(indices)
 
         # Defining the material and the light_direction
-        unif = dict({"k_a": (.25, .21, .21), "k_d": (1, .83, .83), "k_s": (.3, .3, .3), "s": .088, "light_dir": (0, 0, -1)})
+        uniforms = dict({"k_a": (.25, .21, .21), "k_d": (1, .83, .83), "k_s": (.3, .3, .3), "s": .088, "light_dir": (0, 0, -1)})
 
-        mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals), index=self.indices, uniforms=unif)
+        mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals),
+                    index=self.indices, uniforms=uniforms)
 
         # setup & upload texture to GPU, bind it to shader name 'diffuse_map'
-        texture1 = Texture(tex, self.wrap, *self.filter)
+        # texture1 = Texture(tex, self.wrap, *self.filter)
         # texture2 = Texture(tex[1], self.wrap, *self.filter)
-        super().__init__(mesh, diffuse_map=texture1)  # second_texture=texture2)
+        # super().__init__(mesh, diffuse_map=texture1)  # second_texture=texture2)
+        super().__init__(mesh)
 
     def key_handler(self, key):
         # cycle through texture modes on keypress of F6 (wrap) or F7 (filtering)
@@ -97,7 +99,7 @@ def main():
 
     light_dir = (0, 0, -1)
     viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file, shader, light_dir=light_dir)])
-    viewer.add(Floor(shader, "stone.png"))
+    viewer.add(Floor(shader))
 
     # start rendering loop
     viewer.run()
