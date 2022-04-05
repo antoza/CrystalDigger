@@ -16,6 +16,7 @@ from math import sqrt
 def norm(vect):
     return sqrt(vect[0]**2 + vect[1] ** 2 + vect[2] ** 2)
 
+
 class Surface(Textured):
 
     def __init__(self, shader, tex=None, amp=1, n_x=30, n_y=30):
@@ -89,7 +90,7 @@ class Surface(Textured):
         self.indices = np.array(indices)
 
         # Defining the material and the light_direction
-        uniforms = dict({"k_a": (.25, .21, .21), "k_d": (1, .83, .83), "k_s": (.3, .3, .3), "s": .088, "light_dir": (-1, -.2, -1)})
+        uniforms = dict({"k_a": (.15, .15, .15), "k_d": (1, 1, 1), "k_s": (.3, .3, .3), "s": .008, "light_dir": (-1, -.2, -1)})
 
         mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals),
                     index=self.indices, uniforms=uniforms)
