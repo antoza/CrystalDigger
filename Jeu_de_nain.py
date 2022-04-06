@@ -214,9 +214,21 @@ class Spider :
                 #animation avec rotation de -90° dans le sens trigo
         self.orientation = movement
 
+
+class Barrel :
+    def __init__(self, pos) :
+        self.pos = pos
+    
+    def move(movement, src_rail, dst_rail) :
+        self.pos[0] += movement[0]
+        self.pos[1] += movement[1]
+        #animation avec translation de movement
+
+
 class Minecart :
     def __init__(self, pos, rail = 3) :
         self.pos = pos
+        # TODO : modifier l'initialisation de l'orientation
         self.rail = 3
     
     def move(movement, src_rail, dst_rail) :
@@ -226,23 +238,24 @@ class Minecart :
             if rail in (3, 4) :
                 self.linear_roll(movement)
             else :
-                self.rotative_roll(movement)
+                self.rotative_roll(movement, rail)
                 
     def linear_roll(movement) :
-        #animation avec translation de movement
+        #animation avec translation de movement/2
     
-    def rotative_roll(movement) :
-        if movement[0] == orientation[0] or movement[1] == orientation[1] :
-            if movement[0] == orientation[0] and movement[1] == orientation[1] :
-                #animation sans rotation
-            else :
-                #animation avec rotation de 45° dans le sens trigo
-        else :
-            if movement[1] == orientation[0] and movement[0] == -orientation[1] :
-                #animation avec rotation de 90° dans le sens trigo
-            else :
-                #animation avec rotation de -90° dans le sens trigo
-        self.orientation = movement
+    def rotative_roll(movement, rail) :
+        if movement[0] == -1 :
+            trigo_rotation = rail in (5, 6)
+        if movement[0] == 1 :
+            trigo_rotation = rail in (7, 8)
+        if movement[1] == -1 :
+            trigo_rotation = rail in (6, 8)
+        if movement[1] == 1 :
+            trigo_rotation = rail in (5, 7)
+        
+        rotation_center = ((rail-5)%2-1/2, (rail-5)//2-1/2)
+        #animation avec rotation d'angle 45° dans le sens trigo si trigo_rotation est à True
+        #autour de rotation_center
 
 def print_board() :
     print("")
