@@ -143,13 +143,106 @@ def binary_board() :
 def find_best_movement(pos) :
 
 
-class Spider:
-    def __init__(self, pos, angle = 0) :
+class Player :
+    def __init__(self, pos, orientation = (1, 0)) :
         self.pos = pos
-        self.angle = angle
+        self.orientation = orientation
+    
+    def move(movement) :
+        self.rotate(movement)
+        self.walk(movement)
+
+    def mine(movement) :
+        self.rotate(movement)
+        #animation minage
+    
+    def push(movement) :
+        self.rotate(movement)
+        #animation lever les bras
+        self.walk(movement)
+        #animation baisser les bras
+
+    def die() :
+        #animate dying
+
+    def walk(movement) :
+        self.pos[0] += movement[0]
+        self.pos[1] += movement[1]
+        #animation avec translation de movement
+    
+    def rotate(movement) :
+        if movement[0] == orientation[0] or movement[1] == orientation[1] :
+            if movement[0] == orientation[0] and movement[1] == orientation[1] :
+                #animation sans rotation
+            else :
+                #animation avec rotation de 180° dans le sens trigo
+        else :
+            if movement[1] == orientation[0] and movement[0] == -orientation[1] :
+                #animation avec rotation de 90° dans le sens trigo
+            else :
+                #animation avec rotation de -90° dans le sens trigo
+        self.orientation = movement
 
 
+class Spider :
+    def __init__(self, pos, orientation = (1, 0)) :
+        self.pos = pos
+        self.orientation = orientation
+    
+    def move(movement) :
+        self.rotate(movement)
+        self.walk(movement)
 
+    def attack() :
+        #animate attacking
+
+    def walk(movement) :
+        self.pos[0] += movement[0]
+        self.pos[1] += movement[1]
+        #animation avec translation de movement
+    
+    def rotate(movement) :
+        if movement[0] == orientation[0] or movement[1] == orientation[1] :
+            if movement[0] == orientation[0] and movement[1] == orientation[1] :
+                #animation sans rotation
+            else :
+                #animation avec rotation de 180° dans le sens trigo
+        else :
+            if movement[1] == orientation[0] and movement[0] == -orientation[1] :
+                #animation avec rotation de 90° dans le sens trigo
+            else :
+                #animation avec rotation de -90° dans le sens trigo
+        self.orientation = movement
+
+class Minecart :
+    def __init__(self, pos, rail = 3) :
+        self.pos = pos
+        self.rail = 3
+    
+    def move(movement, src_rail, dst_rail) :
+        self.pos[0] += movement[0]
+        self.pos[1] += movement[1]
+        for rail in (src_rail, dst_rail) :
+            if rail in (3, 4) :
+                self.linear_roll(movement)
+            else :
+                self.rotative_roll(movement)
+                
+    def linear_roll(movement) :
+        #animation avec translation de movement
+    
+    def rotative_roll(movement) :
+        if movement[0] == orientation[0] or movement[1] == orientation[1] :
+            if movement[0] == orientation[0] and movement[1] == orientation[1] :
+                #animation sans rotation
+            else :
+                #animation avec rotation de 45° dans le sens trigo
+        else :
+            if movement[1] == orientation[0] and movement[0] == -orientation[1] :
+                #animation avec rotation de 90° dans le sens trigo
+            else :
+                #animation avec rotation de -90° dans le sens trigo
+        self.orientation = movement
 
 def print_board() :
     print("")
