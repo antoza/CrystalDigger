@@ -3,7 +3,7 @@
 import numpy as np
 
 from core import Shader, Viewer, Node
-from transform import rotate, translate, scale, identity
+from transform import rotate, translate, scale
 
 from surface import Surface
 
@@ -82,8 +82,8 @@ def generate_walls(surface, level):
 def generate_scene(shader, level):
     # adding the floor
     x, y = level.shape
-    wall_tile = Surface(shader, n_x=30, n_y=30)
-    floor_tile = Surface(shader, n_x=10, n_y=10, amp=.1)
+    wall_tile = Surface(shader, n_x=50, n_y=50, amp=2, f=.1)
+    floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1)
 
     floor = generate_floor(floor_tile, level)
     walls = generate_walls(wall_tile, level)
@@ -97,7 +97,7 @@ def generate_scene(shader, level):
 
 def main():
     viewer = Viewer()
-    shader = Shader("texture.vert", "texture.frag")
+    shader = Shader("shaders/texture.vert", "shaders/scene.frag")
 
     list_level = [[1, 1, 1, 1, 1],
                   [1, 0, 0, 0, 1],
@@ -108,9 +108,7 @@ def main():
     level = np.array(list_level)
 
     scene = generate_scene(shader, level)
-
     viewer.add(scene)
-
     viewer.run()
 
 

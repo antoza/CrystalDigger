@@ -6,7 +6,7 @@ import OpenGL.GL as GL  # standard Python OpenGL wrapper
 import glfw  # lean window system wrapper for OpenGL
 import numpy as np  # all matrix manipulations & OpenGL args
 from core import Shader, Viewer, Mesh, load
-from texture import Texture, Textured
+from texture import Textured
 from perlin import Perlin2d
 from transform import vec, translate, scale
 from core import Node
@@ -21,20 +21,10 @@ def norm(vect):
 
 class Surface(Textured):
 
-    def __init__(self, shader, amp=1, n_x=30, n_y=30):
+    def __init__(self, shader, amp=1, n_x=30, n_y=30, f=.2):
         # Perlin noise initialisation
         n = 16
         perlin = Perlin2d(n=n)
-
-        # prepare texture modes cycling variables for interactive toggling
-        self.wraps = cycle([GL.GL_REPEAT, GL.GL_MIRRORED_REPEAT,
-                            GL.GL_CLAMP_TO_BORDER, GL.GL_CLAMP_TO_EDGE])
-        self.filters = cycle([(GL.GL_NEAREST, GL.GL_NEAREST),
-                              (GL.GL_LINEAR, GL.GL_LINEAR),
-                              (GL.GL_LINEAR, GL.GL_LINEAR_MIPMAP_LINEAR)])
-        self.wrap, self.filter = next(self.wraps), next(self.filters)
-
-        f = .2
 
         vert = []
         normals = []
@@ -93,7 +83,7 @@ class Surface(Textured):
         self.indices = np.array(indices)
 
         # Defining the material and the light_direction
-        uniforms = dict({"k_a": (.2, .2, .2), "k_d": (1, 1, 1), "k_s": (.5, .5, .5), "s": .1, "light_dir": (-1, -.2, -1)})
+        uniforms = dict({"k_a": (.4, .4, .4), "k_d": (.4, .4, .4), "k_s": (.4, .4, .4), "s": 100, "light_dir": (-1, -.2, -1)})
 
         mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals),
                     index=self.indices, uniforms=uniforms)
@@ -104,7 +94,6 @@ class Surface(Textured):
         # super().__init__(mesh, diffuse_map=texture1)  # second_texture=texture2)
         super().__init__(mesh)
 
-
     def get_size(self):
         return self.n_x, self.n_y
 
@@ -113,10 +102,10 @@ class Surface(Textured):
 def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer()
-    shader = Shader("shaders/animatedAndTextured.vert", "shaders/texture.frag")
+    shader = Shader("shaders/texture.vert", "shaders/scene.frag")
 
-    surface = Node(transform=translate((-1.5, -1.5, 0)) @ scale(.01, .01, .01))
-    surface.add(Surface(shader))
+    surface = Node(transform=translate((-.5, -.5, 0)) @ scale(1/30, 1/30, 1/30))
+    surface.add(Surface(shader, n_x=50, n_y=50, f=.1, amp=2))
 
     viewer.add(surface)
 
