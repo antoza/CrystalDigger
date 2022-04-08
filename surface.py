@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 from itertools import cycle
+
 import OpenGL.GL as GL  # standard Python OpenGL wrapper
 import glfw  # lean window system wrapper for OpenGL
 import numpy as np  # all matrix manipulations & OpenGL args
@@ -21,7 +22,6 @@ def norm(vect):
 class Surface(Textured):
 
     def __init__(self, shader, amp=1, n_x=30, n_y=30):
-
         # Perlin noise initialisation
         n = 16
         perlin = Perlin2d(n=n)
@@ -104,6 +104,7 @@ class Surface(Textured):
         # super().__init__(mesh, diffuse_map=texture1)  # second_texture=texture2)
         super().__init__(mesh)
 
+
     def get_size(self):
         return self.n_x, self.n_y
 
@@ -112,10 +113,7 @@ class Surface(Textured):
 def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer()
-    shader = Shader("texture.vert", "texture.frag")
-
-    light_dir = (0, 0, -1)
-    viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file, shader, light_dir=light_dir)])
+    shader = Shader("shaders/animatedAndTextured.vert", "shaders/texture.frag")
 
     surface = Node(transform=translate((-1.5, -1.5, 0)) @ scale(.01, .01, .01))
     surface.add(Surface(shader))
@@ -127,4 +125,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()  # main function keeps variables locally scoped
+    main()                     # main function keeps variables locally scoped

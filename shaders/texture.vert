@@ -17,5 +17,5 @@ void main() {
 
     // tell OpenGL how to transform the vertex to clip coordinates
     gl_Position = projection * view * model * vec4(position, 1);
-    frag_tex_coords = position.xy; //tex_coord.xy;
+    frag_tex_coords = position.xy;
 }

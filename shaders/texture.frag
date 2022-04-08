@@ -1,7 +1,6 @@
 #version 330 core
 
 uniform sampler2D diffuse_map;
-uniform sampler2D second_texture;
 
 // fragment position and normal of the fragment, in WORLD coordinates
 // (you can also compute in VIEW coordinates, your choice! rename variables)
@@ -28,9 +27,11 @@ void main() {
     vec3 r = reflect(-l, n);
     vec3 v = normalize(w_camera_position - w_position);
 
-    vec4 phong = vec4(k_a + k_d * max(0, dot(n, l)) + k_s * pow(max(0, dot(r, v)), s*128), 1);
-    vec4 color = texture(diffuse_map, frag_tex_coords);
-    vec4 color2 = texture(second_texture, frag_tex_coords);
+    vec3 diffuse_color = k_d * max(0, dot(n, l));
+    vec3 specular_color = k_s * pow(max(0, dot(r, v)), s);
+    vec4 phong = vec4(k_a + diffuse_color + specular_color, 1);
 
-    out_color = phong;
+    vec4 color = texture(diffuse_map, frag_tex_coords);
+
+    out_color = phong * color;
 }
