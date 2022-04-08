@@ -7,7 +7,8 @@ import numpy as np  # all matrix manipulations & OpenGL args
 from core import Shader, Viewer, Mesh, load
 from texture import Texture, Textured
 from perlin import Perlin2d
-from transform import vec
+from transform import vec, translate, scale
+from core import Node
 from math import sqrt
 
 
@@ -19,7 +20,9 @@ def norm(vect):
 
 class Surface(Textured):
 
-    def __init__(self, shader, tex=None, amp=1, n_x=30, n_y=30):
+    def __init__(self, shader, amp=1, n_x=30, n_y=30):
+
+        # Perlin noise initialisation
         n = 16
         perlin = Perlin2d(n=n)
 
@@ -30,15 +33,15 @@ class Surface(Textured):
                               (GL.GL_LINEAR, GL.GL_LINEAR),
                               (GL.GL_LINEAR, GL.GL_LINEAR_MIPMAP_LINEAR)])
         self.wrap, self.filter = next(self.wraps), next(self.filters)
-        #self.tex = tex
 
         f = .2
 
         vert = []
         normals = []
         indices = []
-        off_x = n_x / 2
-        off_y = n_y / 2
+
+        self.n_x = n_x
+        self.n_y = n_y
         for j in range(n_y):
             for i in range(n_x):
                 # heights of the (possibly) duplicated vertices
@@ -51,14 +54,14 @@ class Surface(Textured):
                 z4 = amp * perlin.noise(f * (I+1), f * (J+1)) + amp * perlin.noise(2 * f * (I+1), 2 * f * (J+1))
 
                 # vertices of the first triangle
-                vert.append((i - off_x, j - off_y, z1))
-                vert.append((i + 1 - off_x, j - off_y, z2))
-                vert.append((i - off_x, j + 1 - off_y, z3))
+                vert.append((i, j, z1))
+                vert.append((i + 1, j, z2))
+                vert.append((i, j + 1, z3))
 
                 # vertices of the second triangle
-                vert.append((i + 1 - off_x, j - off_y, z2))
-                vert.append((i + 1 - off_x, j + 1 - off_y, z4))
-                vert.append((i - off_x, j + 1 - off_y, z3))
+                vert.append((i + 1, j, z2))
+                vert.append((i + 1, j + 1, z4))
+                vert.append((i, j + 1, z3))
 
                 # normals of the first triangle
                 zn1 = z2 + z3 - 2*z1
@@ -90,7 +93,7 @@ class Surface(Textured):
         self.indices = np.array(indices)
 
         # Defining the material and the light_direction
-        uniforms = dict({"k_a": (.15, .15, .15), "k_d": (1, 1, 1), "k_s": (.3, .3, .3), "s": .008, "light_dir": (-1, -.2, -1)})
+        uniforms = dict({"k_a": (.2, .2, .2), "k_d": (1, 1, 1), "k_s": (.5, .5, .5), "s": .1, "light_dir": (-1, -.2, -1)})
 
         mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals),
                     index=self.indices, uniforms=uniforms)
@@ -101,13 +104,8 @@ class Surface(Textured):
         # super().__init__(mesh, diffuse_map=texture1)  # second_texture=texture2)
         super().__init__(mesh)
 
-    def key_handler(self, key):
-        # cycle through texture modes on keypress of F6 (wrap) or F7 (filtering)
-        self.wrap = next(self.wraps) if key == glfw.KEY_F6 else self.wrap
-        self.filter = next(self.filters) if key == glfw.KEY_F7 else self.filter
-        if key in (glfw.KEY_F6, glfw.KEY_F7):
-            texture = Texture(self.tex, self.wrap, *self.filter)
-            self.textures.update(diffuse_map=texture)
+    def get_size(self):
+        return self.n_x, self.n_y
 
 
 # -------------- main program and scene setup --------------------------------
@@ -118,7 +116,11 @@ def main():
 
     light_dir = (0, 0, -1)
     viewer.add(*[mesh for file in sys.argv[1:] for mesh in load(file, shader, light_dir=light_dir)])
-    viewer.add(Surface(shader))
+
+    surface = Node(transform=translate((-1.5, -1.5, 0)) @ scale(.01, .01, .01))
+    surface.add(Surface(shader))
+
+    viewer.add(surface)
 
     # start rendering loop
     viewer.run()

@@ -1,49 +1,96 @@
 #!/usr/bin/env python3
 
-from core import Shader, Viewer, Mesh, load, Node
-from transform import rotate, translate, scale
+import numpy as np
 
-from viewer import Surface
+from core import Shader, Viewer, Node
+from transform import rotate, translate, scale, identity
+
+from surface import Surface
 
 
-def generate_walls(surface, rotation=rotate((0, 0, 1), 0), n_x=10, n_y=10):
-    offset_x = n_x / 2
-    offset_x -= offset_x / n_x
-    offset_y = n_y / 2
-    offset_y -= offset_y / n_y
+def generate_floor(surface, level):
+    sx, sy = surface.get_size()
+    x, y = level.shape
 
-    scale_x = 30
-    scale_y = 30
+    scaling_factor = min(1/sx, 1/sy)
+    s = scale(scaling_factor, scaling_factor, scaling_factor)
+    floor = Node()
 
-    r = rotate((1, 0, 0), 45)
-    s = scale(1 / scale_x, 1 / scale_y, min(1 / scale_x, 1 / scale_y))
-    walls = Node(transform = rotation)
-    for i in range(-1, n_x + 1):
-        t = translate(-offset_x + i, offset_y, offset_x / n_x)
-        wall = Node(transform=t @ r @ s)
-        wall.add(surface)
-        walls.add(wall)
+    for i in range(x):
+        for j in range(y):
+            # Generate roof of the wall
+            if level[i][j] == 1:
+                t = translate(i, j, 1)
+            # Generate floor
+            else:
+                t = translate(i, j, .1)
+            tile = Node(transform=t @ s)
+            tile.add(surface)
+            floor.add(tile)
+    return floor
+
+
+def generate_walls(surface, level):
+    sx, sy = surface.get_size()
+    x, y = level.shape
+
+    scaling_factor = min(1 / sx, 1 / sy)
+    s = scale(scaling_factor, scaling_factor, scaling_factor)
+    walls = Node()
+
+    for i in range(x):
+        for j in range(y):
+            # Generate only on walled tiles
+            if level[i][j] == 1:
+                i_near = [(i-1) % x, (i+1) % x]
+                j_near = [(j-1) % y, (j+1) % y]
+
+                # left wall
+                if level[i_near[0]][j] != 1:
+                    r = rotate((0, 1, 0), -90)
+                    t = translate((i, j, 0))
+                    wall = Node(transform=t @ r @ s)
+                    wall.add(surface)
+                    walls.add(wall)
+
+                # right wall
+                if level[i_near[1]][j] != 1:
+                    r = rotate((0, 1, 0), 90)
+                    t = translate((i+1, j, 1))
+                    wall = Node(transform=t @ r @ s)
+                    wall.add(surface)
+                    walls.add(wall)
+
+                # upper wall
+                if level[i][j_near[0]] != 1:
+                    r = rotate((1, 0, 0), 90)
+                    t = translate((i, j, 0))
+                    wall = Node(transform=t @ r @ s)
+                    wall.add(surface)
+                    walls.add(wall)
+
+                # lower wall
+                if level[i][j_near[1]] != 1:
+                    r = rotate((1, 0, 0), -90)
+                    t = translate((i, j+1, 1))
+                    wall = Node(transform=t @ r @ s)
+                    wall.add(surface)
+                    walls.add(wall)
     return walls
 
 
-def generate_scene(shader):
-    scene = Node(transform=rotate((1, 0, 0), -30) @ translate(0, 5, -10))
-
-    surface = Surface(shader, n_x=30, n_y=30)
-
+def generate_scene(shader, level):
     # adding the floor
-    n_x = 10
-    n_y = 10
-    scene.add(Surface(shader, amp=.1, n_x=n_x, n_y=n_y))
+    x, y = level.shape
+    wall_tile = Surface(shader, n_x=30, n_y=30)
+    floor_tile = Surface(shader, n_x=10, n_y=10, amp=.1)
 
-    upper_walls = generate_walls(surface, n_x=n_x, n_y=n_y)
-    right_walls = generate_walls(surface, n_x=n_x, n_y=n_y, rotation=rotate((0, 0, 1), -90))
-    left_walls = generate_walls(surface, n_x=n_x, n_y=n_y, rotation=rotate((0, 0, 1), 90))
-    lower_walls = generate_walls(surface, n_x=n_x, n_y=n_y, rotation=rotate((0, 0, 1), 180))
-    scene.add(upper_walls)
-    scene.add(right_walls)
-    scene.add(left_walls)
-    scene.add(lower_walls)
+    floor = generate_floor(floor_tile, level)
+    walls = generate_walls(wall_tile, level)
+
+    scene = Node(transform=translate(-x/2, -y/2, 0))
+    scene.add(floor)
+    scene.add(walls)
 
     return scene
 
@@ -52,7 +99,15 @@ def main():
     viewer = Viewer()
     shader = Shader("texture.vert", "texture.frag")
 
-    scene = generate_scene(shader)
+    list_level = [[1, 1, 1, 1, 1],
+                  [1, 0, 0, 0, 1],
+                  [1, 0, 1, 0, 1],
+                  [1, 0, 1, 0, 1],
+                  [1, 0, 1, 0, 1],
+                  [1, 1, 1, 1, 1]]
+    level = np.array(list_level)
+
+    scene = generate_scene(shader, level)
 
     viewer.add(scene)
 
@@ -60,4 +115,7 @@ def main():
 
 
 if __name__ == "__main__":
+    print("============================================================================")
+    print("*             DEMONSTRATION DE LA GENERATION DE LA SCENE                   *")
+    print("============================================================================")
     main()
