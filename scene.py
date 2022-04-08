@@ -3,7 +3,7 @@
 import numpy as np
 
 from core import Shader, Viewer, Node
-from transform import rotate, translate, scale
+from transform import rotate, translate, scale, vec, identity
 
 from surface import Surface
 
@@ -18,7 +18,7 @@ def generate_floor(surface, level):
     sx, sy = surface.get_size()
     x, y = level.shape
 
-    scaling_factor = min(1/sx, 1/sy)
+    scaling_factor = min(1 / sx, 1 / sy)
     s = scale(scaling_factor, scaling_factor, scaling_factor)
     floor = Node()
 
@@ -54,8 +54,8 @@ def generate_walls(surface, level):
         for j in range(y):
             # Generate only on walled tiles
             if level[i][j] == 1:
-                i_near = [(i-1) % x, (i+1) % x]
-                j_near = [(j-1) % y, (j+1) % y]
+                i_near = [(i - 1) % x, (i + 1) % x]
+                j_near = [(j - 1) % y, (j + 1) % y]
 
                 # left wall
                 if level[i_near[0]][j] != 1:
@@ -68,7 +68,7 @@ def generate_walls(surface, level):
                 # right wall
                 if level[i_near[1]][j] != 1:
                     r = rotate((0, 1, 0), 90)
-                    t = translate((i+1, j, 1))
+                    t = translate((i + 1, j, 1))
                     wall = Node(transform=t @ r @ s)
                     wall.add(surface)
                     walls.add(wall)
@@ -84,39 +84,50 @@ def generate_walls(surface, level):
                 # lower wall
                 if level[i][j_near[1]] != 1:
                     r = rotate((1, 0, 0), -90)
-                    t = translate((i, j+1, 1))
+                    t = translate((i, j + 1, 1))
                     wall = Node(transform=t @ r @ s)
                     wall.add(surface)
                     walls.add(wall)
     return walls
 
 
-def generate_torches(torch, level):
+def generate_torches(level):
     """
     Generates the torches of the scene
     :param torch: the model to load
     :param level: the level, giving position of the torches
     :return: a node for the torches, a list of their positions in the level
     """
-
-
-
-
-def generate_scene(shader, level):
-    # adding the floor
     x, y = level.shape
-    lights = [(1, 1, 1)]
-    wall_tile = Surface(shader, n_x=50, n_y=50, amp=2, f=.1)
-    floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1, lights=lights)
+    lights = []
 
-    floor = generate_floor(floor_tile, level)
-    walls = generate_walls(wall_tile, level)
+    for i in range(x):
+        for j in range(y):
+            if level[i][j] == 2:
+                lights.append(vec(i, j, .5, 1))
 
-    scene = Node(transform=translate(-x/2, -y/2, 0))
-    scene.add(floor)
-    scene.add(walls)
+    return Node(), np.array(lights)
 
-    return scene
+
+class Scene(Node):
+
+    def __init__(self, shader, level, transform=identity()):
+        torches, self.lights_pos = generate_torches(level)
+        for i in range(len(self.lights_pos)):
+            self.lights_pos[i] = self.lights_pos[i] @ transform
+
+        self.uniforms = dict({"lights": np.array(self.lights_pos), "nb_lights": len(self.lights_pos)})
+
+        wall_tile = Surface(shader, n_x=50, n_y=50, amp=2, f=.1)
+        floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1)
+
+        floor = generate_floor(floor_tile, level)
+        walls = generate_walls(wall_tile, level)
+
+        super().__init__((floor, walls), transform=transform)
+
+    def draw(self, model=identity(), **other_uniforms):
+        super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape, **other_uniforms)
 
 
 def main():
@@ -124,14 +135,15 @@ def main():
     shader = Shader("shaders/texture.vert", "shaders/scene.frag")
 
     list_level = [[1, 1, 1, 1, 1],
-                  [1, 0, 0, 0, 1],
+                  [1, 2, 0, 0, 1],
                   [1, 0, 1, 0, 1],
                   [1, 0, 1, 0, 1],
                   [1, 0, 1, 0, 1],
                   [1, 1, 1, 1, 1]]
     level = np.array(list_level)
+    x, y = level.shape
 
-    scene = generate_scene(shader, level)
+    scene = Scene(shader, level, transform=translate(-x / 2, -y / 2, 0))
     viewer.add(scene)
     viewer.run()
 
