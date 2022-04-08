@@ -16,12 +16,12 @@ from math import sqrt
 # -------------- Notre petit jeu fait maison :) ---------------------------------
 
 def norm(vect):
-    return sqrt(vect[0]**2 + vect[1] ** 2 + vect[2] ** 2)
+    return sqrt(vect[0] ** 2 + vect[1] ** 2 + vect[2] ** 2)
 
 
-class Surface(Textured):
+class Surface:
 
-    def __init__(self, shader, amp=1, n_x=30, n_y=30, f=.2):
+    def __init__(self, shader, amp=1, n_x=30, n_y=30, f=.2, lights=None):
         # Perlin noise initialisation
         n = 16
         perlin = Perlin2d(n=n)
@@ -39,9 +39,9 @@ class Surface(Textured):
                 J = j
 
                 z1 = amp * perlin.noise(f * I, f * J) + amp * perlin.noise(2 * f * I, 2 * f * J)
-                z2 = amp * perlin.noise(f * (I + 1), f * J) + amp * perlin.noise(2 * f * (I+1), 2 * f * J)
-                z3 = amp * perlin.noise(f * I, f * (J+1)) + amp * perlin.noise(2 * f * I, 2 * f * (J+1))
-                z4 = amp * perlin.noise(f * (I+1), f * (J+1)) + amp * perlin.noise(2 * f * (I+1), 2 * f * (J+1))
+                z2 = amp * perlin.noise(f * (I + 1), f * J) + amp * perlin.noise(2 * f * (I + 1), 2 * f * J)
+                z3 = amp * perlin.noise(f * I, f * (J + 1)) + amp * perlin.noise(2 * f * I, 2 * f * (J + 1))
+                z4 = amp * perlin.noise(f * (I + 1), f * (J + 1)) + amp * perlin.noise(2 * f * (I + 1), 2 * f * (J + 1))
 
                 # vertices of the first triangle
                 vert.append((i, j, z1))
@@ -54,8 +54,8 @@ class Surface(Textured):
                 vert.append((i, j + 1, z3))
 
                 # normals of the first triangle
-                zn1 = z2 + z3 - 2*z1
-                zn2 = z4 + z2 - 2*z3
+                zn1 = z2 + z3 - 2 * z1
+                zn2 = z4 + z2 - 2 * z3
                 if zn1 == 0:
                     normal1 = vec((0, 0, 1))
                 else:
@@ -83,19 +83,19 @@ class Surface(Textured):
         self.indices = np.array(indices)
 
         # Defining the material and the light_direction
-        uniforms = dict({"k_a": (.4, .4, .4), "k_d": (.4, .4, .4), "k_s": (.4, .4, .4), "s": 100, "light_dir": (-1, -.2, -1)})
+        self.uniforms = dict({"k_a": (.4, .4, .4), "k_d": (.4, .4, .4), "k_s": (.4, .4, .4), "s": 100})
+        if lights:
+            self.uniforms["lights"] = lights
+            self.uniforms["nb_lights"] = len(lights)
 
-        mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals),
-                    index=self.indices, uniforms=uniforms)
-
-        # setup & upload texture to GPU, bind it to shader name 'diffuse_map'
-        # texture1 = Texture(tex, self.wrap, *self.filter)
-        # texture2 = Texture(tex[1], self.wrap, *self.filter)
-        # super().__init__(mesh, diffuse_map=texture1)  # second_texture=texture2)
-        super().__init__(mesh)
+        self.mesh = Mesh(shader, attributes=dict(position=self.vert, normal=self.normals),
+                         index=self.indices, uniforms=self.uniforms)
 
     def get_size(self):
         return self.n_x, self.n_y
+
+    def draw(self, primitives=GL.GL_TRIANGLES, **uniforms):
+        self.mesh.draw(primitives=primitives, uniforms=uniforms)
 
 
 # -------------- main program and scene setup --------------------------------
@@ -104,7 +104,7 @@ def main():
     viewer = Viewer()
     shader = Shader("shaders/texture.vert", "shaders/scene.frag")
 
-    surface = Node(transform=translate((-.5, -.5, 0)) @ scale(1/30, 1/30, 1/30))
+    surface = Node()  # transform=translate((-.5, -.5, 0)))  # @ scale(1 / 30, 1 / 30, 1 / 30))
     surface.add(Surface(shader, n_x=50, n_y=50, f=.1, amp=2))
 
     viewer.add(surface)
@@ -114,4 +114,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()                     # main function keeps variables locally scoped
+    main()  # main function keeps variables locally scoped

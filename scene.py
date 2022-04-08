@@ -9,6 +9,12 @@ from surface import Surface
 
 
 def generate_floor(surface, level):
+    """
+    Generates the floor and ceiling of the scene
+    :param surface: the surface to be used for the floor
+    :param level: the level, giving position of the floor
+    :return: a node for the floor and ceiling
+    """
     sx, sy = surface.get_size()
     x, y = level.shape
 
@@ -31,6 +37,12 @@ def generate_floor(surface, level):
 
 
 def generate_walls(surface, level):
+    """
+    Generates the walls of the scene
+    :param surface: the surface to be used for the floor
+    :param level: the level, giving position of the floor
+    :return: a node for the walls
+    """
     sx, sy = surface.get_size()
     x, y = level.shape
 
@@ -79,11 +91,23 @@ def generate_walls(surface, level):
     return walls
 
 
+def generate_torches(torch, level):
+    """
+    Generates the torches of the scene
+    :param torch: the model to load
+    :param level: the level, giving position of the torches
+    :return: a node for the torches, a list of their positions in the level
+    """
+
+
+
+
 def generate_scene(shader, level):
     # adding the floor
     x, y = level.shape
+    lights = [(1, 1, 1)]
     wall_tile = Surface(shader, n_x=50, n_y=50, amp=2, f=.1)
-    floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1)
+    floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1, lights=lights)
 
     floor = generate_floor(floor_tile, level)
     walls = generate_walls(wall_tile, level)
