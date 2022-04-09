@@ -162,6 +162,7 @@ class Node:
         self.transform = transform
         self.world_transform = identity()
         self.children = list(iter(children))
+        self.display = True
 
     def add(self, *drawables):
         """ Add drawables to this node, simply updating children list """
@@ -169,6 +170,8 @@ class Node:
 
     def draw(self, model=identity(), **other_uniforms):
         """ Recursive draw, passing down updated model matrix. """
+        if not self.display:
+            return
         self.world_transform = model @ self.transform
         for child in self.children:
             child.draw(model=self.world_transform, **other_uniforms)
@@ -387,13 +390,35 @@ class Viewer(Node):
 
     def on_key(self, _win, key, _scancode, action, _mods):
         """ 'Q' or 'Escape' quits """
+        old = self.mouse
         if action == glfw.PRESS or action == glfw.REPEAT:
-            if key == glfw.KEY_ESCAPE or key == glfw.KEY_Q:
+            if key == glfw.KEY_ESCAPE:
                 glfw.set_window_should_close(self.win, True)
-            if key == glfw.KEY_W:
+            if key == glfw.KEY_Q:
                 GL.glPolygonMode(GL.GL_FRONT_AND_BACK, next(self.fill_modes))
             if key == glfw.KEY_SPACE:
                 glfw.set_time(0.0)
+            self.key_handler(key)
+
+        if action == glfw.PRESS or action == glfw.REPEAT:
+            old = self.mouse
+            if key == glfw.KEY_W:
+                self.trackball.zoom(1, glfw.get_window_size(_win)[1])
+            if key == glfw.KEY_S:
+                self.trackball.drag(old, (old[0] + 1, old[1] +10 ), glfw.get_window_size(_win)[1])
+                #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
+
+        if action == glfw.PRESS or action == glfw.REPEAT:
+            old = self.mouse
+            if key == glfw.KEY_T:
+                self.mouse = (old[0], old[1] - 10)
+            if key == glfw.KEY_A:
+                self.mouse = (old[0] + 10, old[1])
+            if key == glfw.KEY_Y:
+                self.mouse = (old[0], old[1] + 10)
+            if key == glfw.KEY_D:
+                self.mouse = (old[0] - 10, old[1])
+            self.trackball.pan(old, self.mouse)
 
             # call Node.key_handler which calls key_handlers for all drawables
             self.key_handler(key)
