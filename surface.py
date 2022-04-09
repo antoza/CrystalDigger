@@ -109,4 +109,7 @@ def main():
 
 
 if __name__ == '__main__':
+    print("============================================================================")
+    print("*            DEMONSTRATION DE LA GENERATION D'UNE SURFACE                  *")
+    print("============================================================================")
     main()  # main function keeps variables locally scoped

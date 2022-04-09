@@ -6,6 +6,7 @@ from core import Shader, Viewer, Node
 from transform import rotate, translate, scale, vec, identity
 
 from surface import Surface
+from color import fire, catmull_derivatives
 
 
 def generate_floor(surface, level):
@@ -104,7 +105,7 @@ def generate_torches(level):
     for i in range(x):
         for j in range(y):
             if level[i][j] == 2:
-                lights.append(vec(i, j, .5, 1))
+                lights.append(vec(i + .25, j + .25, .5, 1))
 
     return Node(), np.array(lights)
 
@@ -114,9 +115,10 @@ class Scene(Node):
     def __init__(self, shader, level, transform=identity()):
         torches, self.lights_pos = generate_torches(level)
         for i in range(len(self.lights_pos)):
-            self.lights_pos[i] = self.lights_pos[i] @ transform
+            self.lights_pos[i] = transform @ self.lights_pos[i]
 
-        self.uniforms = dict({"lights": np.array(self.lights_pos), "nb_lights": len(self.lights_pos)})
+        self.light_colors = fire
+        self.catmull = catmull_derivatives(fire, .5)
 
         wall_tile = Surface(shader, n_x=50, n_y=50, amp=2, f=.1)
         floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1)
@@ -127,7 +129,9 @@ class Scene(Node):
         super().__init__((floor, walls), transform=transform)
 
     def draw(self, model=identity(), **other_uniforms):
-        super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape, **other_uniforms)
+        super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape,
+                     light_colors=self.light_colors, nb_colors=self.light_colors.shape[0],
+                     catmull=self.catmull, d_segt=.5, **other_uniforms)
 
 
 def main():
@@ -137,7 +141,7 @@ def main():
     list_level = [[1, 1, 1, 1, 1],
                   [1, 2, 0, 0, 1],
                   [1, 0, 1, 0, 1],
-                  [1, 0, 1, 0, 1],
+                  [1, 0, 0, 2, 1],
                   [1, 0, 1, 0, 1],
                   [1, 1, 1, 1, 1]]
     level = np.array(list_level)
