@@ -1,18 +1,47 @@
 from entity_classes import *
 
-solids = [ [1, 1, 1, 1, 1, 1, 1],
-           [1, 0, 4, 1, 0, 0, 1],
-           [1, 0, 4, 1, 4, 0, 1],
-           [1, 0, 4, 1, 4, 0, 1],
-           [1, 0, 7, 3, 5, 0, 1],
-           [1, 1, 1, 1, 1, 1, 1] ]
+#solids = [ [1, 1, 1, 1, 1, 1, 1],
+#           [1, 0, 4, 1, 0, 0, 1],
+#           [1, 0, 4, 1, 4, 0, 1],
+#           [1, 0, 4, 1, 4, 0, 1],
+#           [1, 0, 7, 3, 5, 0, 1],
+#           [1, 1, 1, 1, 1, 1, 1] ]
 
-entities = [ [0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 1, 1, 0],
-             [0, 0, 0, 0, 0, 1, 0],
-             [0, 0, 0, 0, 3, 0, 0],
-             [0, 1, 2, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0] ]
+solids = [ [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+           [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+           [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
+           [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
+           [1, 1, 0, 0, 1, 1, 0, 0, 0, 1],
+           [1, 3, 3, 0, 0, 0, 3, 3, 3, 1],
+           [1, 0, 0, 0, 0, 1, 0, 1, 1, 1],
+           [1, 0, 1, 0, 1, 1, 0, 0, 0, 1],
+           [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+           [1, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+           [1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+           [1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+           [1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
+           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1] ]
+
+entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 2, 0, 0],
+             [0, 0, 3, 0, 0, 0, 0, 3, 0, 0],
+             [0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 1, 4, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 4, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ]
+#entities = [ [0, 0, 0, 0, 0, 0, 0],
+#             [0, 0, 0, 0, 4, 1, 0],
+#             [0, 0, 0, 0, 0, 1, 0],
+#             [0, 0, 0, 0, 0, 0, 0],
+#             [0, 1, 0, 0, 0, 0, 0],
+#             [0, 0, 0, 0, 0, 0, 0] ]
 
 # Values meaning :
 
@@ -33,7 +62,7 @@ entities = [ [0, 0, 0, 0, 0, 0, 0],
 # 3 : minecart
 # 4 : spider
 
-character_pos = (1, 1)
+character_pos = (7, 6)
 
 
 def change_board(movement) :
@@ -80,10 +109,11 @@ def change_board(movement) :
 
     elif isinstance(entity, Spider) :
         player.move(movement)
-        spider.attack()
+        entity.attack()
         player.die()
-
-    spiders_moving()
+        return
+    
+    spiders_moving(movement)
     return
 
 
@@ -99,47 +129,40 @@ def entity_on(pos) :
 def change_entity(pos, value) :
     entities[pos[0]][pos[1]] = value
 
-# def push(pos, movement, entity) :
-#     given_object_pos = position_after_move(pos, movement)
-
-#     # check if the entity can be pushed
-#     if isinstance(entity, Minecart) and solid_on(given_object_pos) < 3 :
-#         return False
-#     elif isinstance(entity, Barrel) and solid_on(given_object_pos) == 1 :
-#         return False
-#     if entity_on(given_object_pos) != 0 and not isinstance(entity_on(given_object_pos), Spider) :
-#         return False
-    
-#     change_entity(given_object_pos, entity)
-#     change_entity(pos, 0)
-#     entity.push(movement)
-#     return True
 
 
 
 
+def spiders_moving(player_movement) :
 
-
-def spiders_moving() :
-    spiders = get_spiders()
     player_connexe = get_player_connexe()
     for spider in spiders :
-        if spider in player_connexe :
-            new_spider = best_movement(spider)
-
-
-def get_spiders() :
-    spiders = []
-    for i in range(len(entities)) :
-        for j in range(len(entities[0])) :
-            if entity_on((i,j)) == 4 :
-                spiders.append((i,j))
-    return spiders
+        if spider.pos in player_connexe :
+            best_movement = find_best_movement(spider.pos, player_connexe, player_movement)
+            given_pos = position_after_move(spider.pos, best_movement)
+            change_entity(given_pos, spider)
+            change_entity(spider.pos, 0)
+            spider.move(best_movement)
+            if spider.pos == player.pos :
+                spider.attack()
+                player.die()
+        elif isinstance(entity_on(spider.pos), (Barrel, Minecart)):
+            movement1 = player_movement
+            movement2 = (-player_movement[1], player_movement[0])
+            movement3 = (player_movement[1], -player_movement[0])
+            for movement in (movement1, movement2, movement3) :
+                pos = position_after_move(spider.pos, movement)
+                if not (solid_on(pos) == 1 or isinstance(entity_on(pos), (Ore, Barrel, Minecart))) :
+                    change_entity(pos, spider)
+                    spider.move(movement)
+                    return
+            spiders.remove(spider)
+            spider.die()
 
 def get_player_connexe() :
     connexe = set()
     bboard = binary_board()
-    find_connexe(bboard, connexe, character_pos)
+    find_connexe(bboard, connexe, player.pos)
     return connexe
 
 def find_connexe(bboard, connexe, pos) :
@@ -155,15 +178,56 @@ def binary_board() :
     for i in range(len(solids)) :
         bline = []
         for j in range(len(solids[0])) :
-            if solids[i][j] == 1 or entities[i][j] in (1, 2, 3) :
+            if solid_on((i,j)) == 1 or isinstance(entity_on((i,j)), (Ore, Barrel, Minecart)) :
                 bline.append(1)
             else :
                 bline.append(0)
         bboard.append(bline)
     return bboard
 
-def find_best_movement(pos) :
-    return
+def find_best_movement(pos, connexe, player_movement) :
+    #all the possible movements, in general
+    movements = ((1, 0), (0, 1), (-1, 0), (0, -1))
+
+    #all the possible movements for the spider
+    possible_movements = {}
+    for movement in movements :
+        if position_after_move(pos, movement) in connexe :
+            possible_movements[position_after_move(pos, movement)] = movement
+
+    #if the spider is next to the player, go towards him
+    if player.pos in possible_movements :
+        return possible_movements[player.pos]
+
+    #initialisation of all the visited and not-visited tiles
+    visited = set()
+    not_visited = set()
+    for tile in connexe :
+        not_visited.add(tile)
+    visited.add(player.pos)
+    not_visited.remove(player.pos)
+
+    #find all the movements that allow the spider to move towards the player
+    best_movements = []
+    found = False
+    while not found :
+        temp = set()
+        for tile in visited :
+            for movement in movements :
+                new_tile = position_after_move(tile, movement)
+                if new_tile in not_visited :
+                    if new_tile in possible_movements :
+                        best_movements.append(possible_movements[new_tile])
+                        found = True
+                    not_visited.remove(new_tile)
+                    temp.add(new_tile)
+        visited = temp
+
+    #if many movements are possible, prioritize the one that doesn't copy the player's movement
+    for movement in best_movements :
+        if movement != player_movement :
+            return movement
+    return player_movement
 
 
 def print_board() :
@@ -172,32 +236,32 @@ def print_board() :
         line = ""
         for j in range(len(solids[0])) :
             if (i,j) == player.pos :
-                line += "☺"
+                line += "☺ "
             elif entity_on((i,j)) == 0 :
                 if solids[i][j] == 0 :
-                    line += " "
+                    line += "  "
                 elif solids[i][j] == 1 :
-                    line += "▓"
+                    line += "▓▓"
                 elif solids[i][j] == 3 :
-                    line += "═"
+                    line += "══"
                 elif solids[i][j] == 4 :
-                    line += "║"
+                    line += "║ "
                 elif solids[i][j] == 5 :
-                    line += "╝"
+                    line += "╝ "
                 elif solids[i][j] == 6 :
-                    line += "╗"
+                    line += "╗ "
                 elif solids[i][j] == 7 :
-                    line += "╚"
+                    line += "╚═"
                 elif solids[i][j] == 8 :
-                    line += "╔"
+                    line += "╔═"
             elif isinstance(entity_on((i,j)), Ore) :
-                line += "▲"
+                line += "▲ "
             elif isinstance(entity_on((i,j)), Barrel) :
-                line += "o"
+                line += "o "
             elif isinstance(entity_on((i,j)), Minecart) :
-                line += "◙"
+                line += "◙ "
             elif isinstance(entity_on((i,j)), Spider) :
-                line += "x"
+                line += "x "
         print(line)
 
 def create_all_entities() :
@@ -212,11 +276,14 @@ def create_all_entities() :
                 if entity == 3 :
                     change_entity((i,j), Minecart((i,j)))
                 if entity == 4 :
-                    change_entity((i,j), Spider((i,j)))
+                    spider = Spider((i,j))
+                    spiders.append(spider)
+                    change_entity((i,j), spider)
                 
 
 
 player = Player(character_pos)
+spiders = []
 
 if __name__ == '__main__' :
     create_all_entities()
