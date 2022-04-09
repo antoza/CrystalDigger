@@ -8,7 +8,7 @@ solids = [ [1, 1, 1, 1, 1, 1, 1],
 entities = [ [0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 1, 1, 0],
              [0, 0, 0, 0, 0, 1, 0],
-             [0, 0, 0, 0, 3, 4, 0],
+             [0, 0, 0, 0, 3, 0, 0],
              [0, 1, 2, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0] ]
 
@@ -33,30 +33,45 @@ entities = [ [0, 0, 0, 0, 0, 0, 0],
 
 character_pos = (1, 1)
 
-alive = True
 
-def change_board(move) :
-    global character_pos
-    given_pos = position_after_move(character_pos, move)
+def change_board(movement) :
+    given_pos = position_after_move(player.pos, movement)
     if solid_on(given_pos) == 1 :
         return
+
     entity = entity_on(given_pos)
     if entity == 0 :
-        character_pos = given_pos
-        #animate character moving
-    elif entity == 1 :
-        mine(given_pos)
-        #animate mining
-    elif entity == 2 or entity == 3 :
-        if not push(given_pos, move, entity) :
+        player.move(movement)
+
+    elif isinstance(entity, Ore) :
+        change_entity(given_pos, 0)
+        player.mine(movement)
+        entity.destroy()
+
+    elif isinstance(entity, Barrel) or isinstance(entity, Minecart) :
+        target_pos = position_after_move(given_pos, movement)
+
+        # check if the entity can be pushed
+        if isinstance(entity, Minecart) and solid_on(target_pos) < 3 :
             return
-        character_pos = given_pos
-        #animate pushing
-    elif entity == 4 :
-        character_pos = given_pos
-        die()
+        elif isinstance(entity, Barrel) and solid_on(target_pos) == 1 :
+            return
+        if entity_on(target_pos) != 0 and not isinstance(entity_on(target_pos), Spider) :
+            return
+        
+        change_entity(target_pos, entity)
+        change_entity(given_pos, 0)
+        player.push(movement)
+        entity.move(movement, solid_on(given_pos), solid_on(target_pos))
+
+    elif isinstance(entity, Spider) :
+        player.move(movement)
+        spider.attack()
+        player.die()
+
     spiders_moving()
     return
+
 
 def position_after_move(pos, move) :
     return (pos[0] + move[0], pos[1] + move[1])
@@ -70,29 +85,22 @@ def entity_on(pos) :
 def change_entity(pos, value) :
     entities[pos[0]][pos[1]] = value
 
-def mine(pos) :
-    change_entity(pos, 0)
+# def push(pos, movement, entity) :
+#     given_object_pos = position_after_move(pos, movement)
 
-def push(pos, move, entity) :
-    given_object_pos = position_after_move(pos, move)
-
-    # check if the entity can be pushed
-    if entity == 3 and solid_on(given_object_pos) < 3 :
-        return False
-    elif entity == 2 and solid_on(given_object_pos) == 1 :
-        return False
-    if entity_on(given_object_pos) not in (0, 4) :
-        return False
+#     # check if the entity can be pushed
+#     if isinstance(entity, Minecart) and solid_on(given_object_pos) < 3 :
+#         return False
+#     elif isinstance(entity, Barrel) and solid_on(given_object_pos) == 1 :
+#         return False
+#     if entity_on(given_object_pos) != 0 and not isinstance(entity_on(given_object_pos), Spider) :
+#         return False
     
-    change_entity(given_object_pos, entity)
-    change_entity(pos, 0)
-    return True
+#     change_entity(given_object_pos, entity)
+#     change_entity(pos, 0)
+#     entity.push(movement)
+#     return True
 
-def die() :
-    global alive
-    alive = False
-    #animate dying
-    return
 
 
 
@@ -141,46 +149,52 @@ def binary_board() :
     return bboard
 
 def find_best_movement(pos) :
+    return
 
 
 class Player :
     def __init__(self, pos, orientation = (1, 0)) :
         self.pos = pos
         self.orientation = orientation
+        self.alive = True
     
-    def move(movement) :
+    def move(self, movement) :
         self.rotate(movement)
         self.walk(movement)
 
-    def mine(movement) :
+    def mine(self, movement) :
         self.rotate(movement)
         #animation minage
     
-    def push(movement) :
+    def push(self, movement) :
         self.rotate(movement)
         #animation lever les bras
         self.walk(movement)
         #animation baisser les bras
 
-    def die() :
+    def die(self) :
+        self.alive = False
         #animate dying
 
-    def walk(movement) :
-        self.pos[0] += movement[0]
-        self.pos[1] += movement[1]
+    def walk(self, movement) :
+        self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         #animation avec translation de movement
     
-    def rotate(movement) :
-        if movement[0] == orientation[0] or movement[1] == orientation[1] :
-            if movement[0] == orientation[0] and movement[1] == orientation[1] :
+    def rotate(self, movement) :
+        if movement[0] == self.orientation[0] or movement[1] == self.orientation[1] :
+            if movement[0] == self.orientation[0] and movement[1] == self.orientation[1] :
                 #animation sans rotation
+                return
             else :
                 #animation avec rotation de 180° dans le sens trigo
+                return
         else :
-            if movement[1] == orientation[0] and movement[0] == -orientation[1] :
+            if movement[1] == self.orientation[0] and movement[0] == -self.orientation[1] :
                 #animation avec rotation de 90° dans le sens trigo
+                return
             else :
                 #animation avec rotation de -90° dans le sens trigo
+                return
         self.orientation = movement
 
 
@@ -189,39 +203,54 @@ class Spider :
         self.pos = pos
         self.orientation = orientation
     
-    def move(movement) :
+    def move(self, movement) :
         self.rotate(movement)
         self.walk(movement)
 
-    def attack() :
+    def attack(self) :
         #animate attacking
+        return
 
-    def walk(movement) :
-        self.pos[0] += movement[0]
-        self.pos[1] += movement[1]
+    def walk(self, movement) :
+        self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         #animation avec translation de movement
     
-    def rotate(movement) :
+    def rotate(self, movement) :
         if movement[0] == orientation[0] or movement[1] == orientation[1] :
             if movement[0] == orientation[0] and movement[1] == orientation[1] :
                 #animation sans rotation
+                return
             else :
                 #animation avec rotation de 180° dans le sens trigo
+                return
         else :
             if movement[1] == orientation[0] and movement[0] == -orientation[1] :
                 #animation avec rotation de 90° dans le sens trigo
+                return
             else :
                 #animation avec rotation de -90° dans le sens trigo
+                return
         self.orientation = movement
+
+
+class Ore :
+    def __init__(self, pos) :
+        self.pos = pos
+    
+    def destroy(self) :
+        #animation de destruction
+        self.__del__()
+
+    def __del__(self):
+        return
 
 
 class Barrel :
     def __init__(self, pos) :
         self.pos = pos
     
-    def move(movement, src_rail, dst_rail) :
-        self.pos[0] += movement[0]
-        self.pos[1] += movement[1]
+    def move(self, movement, src_rail, dst_rail) :
+        self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         #animation avec translation de movement
 
 
@@ -231,19 +260,19 @@ class Minecart :
         # TODO : modifier l'initialisation de l'orientation
         self.rail = 3
     
-    def move(movement, src_rail, dst_rail) :
-        self.pos[0] += movement[0]
-        self.pos[1] += movement[1]
+    def move(self, movement, src_rail, dst_rail) :
+        self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         for rail in (src_rail, dst_rail) :
             if rail in (3, 4) :
                 self.linear_roll(movement)
             else :
                 self.rotative_roll(movement, rail)
                 
-    def linear_roll(movement) :
+    def linear_roll(self, movement) :
         #animation avec translation de movement/2
+        return
     
-    def rotative_roll(movement, rail) :
+    def rotative_roll(self, movement, rail) :
         if movement[0] == -1 :
             trigo_rotation = rail in (5, 6)
         if movement[0] == 1 :
@@ -262,9 +291,9 @@ def print_board() :
     for i in range(len(solids)) :
         line = ""
         for j in range(len(solids[0])) :
-            if (i,j) == character_pos :
+            if (i,j) == player.pos :
                 line += "☺"
-            elif entities[i][j] == 0 :
+            elif entity_on((i,j)) == 0 :
                 if solids[i][j] == 0 :
                     line += " "
                 elif solids[i][j] == 1 :
@@ -281,32 +310,51 @@ def print_board() :
                     line += "╚"
                 elif solids[i][j] == 8 :
                     line += "╔"
-            elif entities[i][j] == 1 :
+            elif isinstance(entity_on((i,j)), Ore) :
                 line += "▲"
-            elif entities[i][j] == 2 :
+            elif isinstance(entity_on((i,j)), Barrel) :
                 line += "o"
-            elif entities[i][j] == 3 :
+            elif isinstance(entity_on((i,j)), Minecart) :
                 line += "◙"
-            elif entities[i][j] == 4 :
+            elif isinstance(entity_on((i,j)), Spider) :
                 line += "x"
         print(line)
 
+def create_all_entities() :
+    for i in range(len(entities)) :
+        for j in range(len(entities[0])) :
+            entity = entity_on((i,j))
+            if entity != 0 :
+                if entity == 1 :
+                    change_entity((i,j), Ore((i,j)))
+                if entity == 2 :
+                    change_entity((i,j), Barrel((i,j)))
+                if entity == 3 :
+                    change_entity((i,j), Minecart((i,j)))
+                if entity == 4 :
+                    change_entity((i,j), Spider((i,j)))
+                
+
+
+player = Player(character_pos)
+
 if __name__ == '__main__' :
-    while(alive) :
+    create_all_entities()
+    while(player.alive) :
         print_board()
         while(True) :
             move_char = input()
             if move_char == 'z':
-                move = (-1, 0)
+                movement = (-1, 0)
                 break
             if move_char == 'q':
-                move = (0, -1)
+                movement = (0, -1)
                 break
             if move_char == 's':
-                move = (1, 0)
+                movement = (1, 0)
                 break
             if move_char == 'd':
-                move = (0, 1)
+                movement = (0, 1)
                 break
-        change_board(move)
+        change_board(movement)
     print_board()
