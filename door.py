@@ -16,13 +16,13 @@ class Slab(Textured):
 def generate_door_frame(slab):
     frame = Node()
 
-    left_frame = Node(transform=translate(-.05, 0, 0) @ scale(.1, 1, .1))
+    left_frame = Node(transform=translate(-.1, .5, 0) @ scale(.1, .5, .1))
     left_frame.add(slab)
 
-    right_frame = Node(transform=translate(1.6, 0, 0) @ scale(.1, 1, .1))
+    right_frame = Node(transform=translate(.7, .5, 0) @ scale(.1, .5, .1))
     right_frame.add(slab)
 
-    upper_frame = Node(transform=translate(.8, .9, 0) @ rotate((0, 0, 1), 90) @ scale(.1, .9, .1))
+    upper_frame = Node(transform=translate(.3, 1.1, 0) @ scale(.5, .1, .1))
     upper_frame.add(slab)
 
     frame.add(left_frame)
@@ -39,13 +39,13 @@ class Door(Node):
         slab = Slab(shader, "wood.png")
 
         door_frame = generate_door_frame(dark_slab)
-        self.door_leaf = Node(transform=translate(.8, -.1, 0) @ scale(.8, .9, .05))
+        self.door_leaf = Node(transform=translate(.3, .5, 0) @ scale(.3, .5, .05))
         self.door_leaf.add(slab)
         self.angle = 0
         self.target_angle = 0
         self.opened = False
 
-        super().__init__((door_frame, self.door_leaf), transform=transform)
+        super().__init__((door_frame, self.door_leaf), transform=transform@rotate((1, 0, 0), 90)@translate(.2, 0, 0))
 
     def key_handler(self, key):
         if key == glfw.KEY_O:
@@ -70,6 +70,9 @@ class Door(Node):
                 self.target_angle = 0
 
         super().draw(model=model, **other_uniforms)
+
+    def get_size(self):
+        return
 
 
 def main():
