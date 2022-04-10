@@ -54,7 +54,6 @@ void main() {
     vec3 n = normalize(w_normal);
     vec3 v = normalize(w_camera_position - w_position);
     vec4 phong = vec4(0, 0, 0, 1);
-    bool illuminated = false;
 
     for(int i=0; i < nb_lights; i++) {
         float d_sq = dot(w_position - lights[i], w_position - lights[i]);
