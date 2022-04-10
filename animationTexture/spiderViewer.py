@@ -30,7 +30,7 @@ class MultiAnimatedSpider(Node):
             self.children[0].display = False
 
     def draw(self, model=identity(), **other_uniforms):
-        limit = 30
+        limit = 50
         if self.iteration < limit and self.etat == "walk":
             self.transform = self.transform @ translate(0, -.25, 0)
             self.iteration += 1
