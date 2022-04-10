@@ -39,7 +39,7 @@ class Door(Node):
         slab = Slab(shader, "wood.png")
 
         door_frame = generate_door_frame(dark_slab)
-        self.door_leaf = Node(transform=translate(.3, .5, 0) @ scale(.3, .5, .05))
+        self.door_leaf = Node(transform=translate(.3, .5, 0) @ rotate((0, 1, 0), 180) @ scale(.3, .5, .05))
         self.door_leaf.add(slab)
         self.angle = 0
         self.target_angle = 0
@@ -69,7 +69,7 @@ class Door(Node):
                 self.angle = 0
                 self.target_angle = 0
 
-        super().draw(model=model, **other_uniforms)
+        super().draw(model=model, k_a=(.4, .4, .4), k_d=(.4, .4, .4), k_s=(.4, .4, .4), s=100, **other_uniforms)
 
     def get_size(self):
         return

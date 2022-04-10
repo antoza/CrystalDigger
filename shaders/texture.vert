@@ -9,6 +9,7 @@ in vec3 normal;
 
 // in world coordinates
 out vec3 w_position, w_normal;
+out vec2 frag_tex_coords;
 
 void main() {
     w_position = (model * vec4(position, 1)).xyz;
@@ -16,4 +17,5 @@ void main() {
 
     // tell OpenGL how to transform the vertex to clip coordinates
     gl_Position = projection * view * model * vec4(position, 1);
+    frag_tex_coords=position.xy;
 }

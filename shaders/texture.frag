@@ -72,5 +72,5 @@ void main() {
     }
 
     vec4 color = texture(diffuse_map, frag_tex_coords);
-    out_color = color; // * phong;
+    out_color = color * phong;
 }

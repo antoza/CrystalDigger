@@ -6,6 +6,7 @@ from core import Shader, Viewer, Node
 from transform import rotate, translate, scale, vec, identity
 
 from surface import Surface
+from door import Door
 from color import fire, catmull_derivatives
 
 
@@ -59,7 +60,7 @@ def generate_walls(surface, level):
                 j_near = [(j - 1) % y, (j + 1) % y]
 
                 # left wall
-                if level[i_near[0]][j] != 1:
+                if level[i_near[0]][j] != 1 or 3:
                     r = rotate((0, 1, 0), -90)
                     t = translate((i, j, 0))
                     wall = Node(transform=t @ r @ s)
@@ -67,7 +68,7 @@ def generate_walls(surface, level):
                     walls.add(wall)
 
                 # right wall
-                if level[i_near[1]][j] != 1:
+                if level[i_near[1]][j] != 1 or 3:
                     r = rotate((0, 1, 0), 90)
                     t = translate((i + 1, j, 1))
                     wall = Node(transform=t @ r @ s)
@@ -75,7 +76,7 @@ def generate_walls(surface, level):
                     walls.add(wall)
 
                 # upper wall
-                if level[i][j_near[0]] != 1:
+                if level[i][j_near[0]] != 1 or 3:
                     r = rotate((1, 0, 0), 90)
                     t = translate((i, j, 0))
                     wall = Node(transform=t @ r @ s)
@@ -83,13 +84,59 @@ def generate_walls(surface, level):
                     walls.add(wall)
 
                 # lower wall
-                if level[i][j_near[1]] != 1:
+                if level[i][j_near[1]] != 1 or 3:
                     r = rotate((1, 0, 0), -90)
                     t = translate((i, j + 1, 1))
                     wall = Node(transform=t @ r @ s)
                     wall.add(surface)
                     walls.add(wall)
     return walls
+
+
+def generate_doors(shader, level):
+    x, y = level.shape
+
+    doors = Node()
+
+    for i in range(x):
+        for j in range(y):
+            if level[i][j] == 3:
+                door = Node()
+
+                i_near = [(i - 1) % x, (i + 1) % x]
+                j_near = [(j - 1) % y, (j + 1) % y]
+
+                # right door
+                if level[i_near[0]][j] != 1:
+                    r = rotate((0, 0, 1), -90)
+                    t = translate((i + 1, j + 1, 0))
+                    door.transform = t @ r @ door.transform
+                    door.add(Door(shader))
+
+                # left door
+                elif level[i_near[1]][j] != 1:
+                    print("On est là !")
+                    r = rotate((0, 0, 1), 90)
+                    t = translate((i, j, 0))
+                    door.transform = t @ r @ door.transform
+                    door.add(Door(shader))
+
+                # lower door
+                elif level[i][j_near[0]] != 1:
+                    t = translate((i, j + 1, 0))
+                    door.transform = t @ door.transform
+                    door.add(Door(shader))
+
+                # upper door
+                elif level[i][j_near[1]] != 1:
+                    r = rotate((0, 0, 1), 180)
+                    t = translate((i + 1, j, 0))
+                    door.transform = t @ r @ door.transform
+                    door.add(Door(shader))
+
+                doors.add(door)
+
+    return doors
 
 
 def generate_torches(level):
@@ -105,7 +152,7 @@ def generate_torches(level):
     for i in range(x):
         for j in range(y):
             if level[i][j] == 2:
-                lights.append(vec(i + .25, j + .25, .5, 1))
+                lights.append(vec(i + .5, j + .5, .5, 1))
 
     return Node(), np.array(lights)
 
@@ -126,22 +173,25 @@ class Scene(Node):
         floor = generate_floor(floor_tile, level)
         walls = generate_walls(wall_tile, level)
 
-        super().__init__((floor, walls), transform=transform)
+        shader_doors = Shader("shaders/texture.vert", "shaders/texture.frag")
+        doors = generate_doors(shader_doors, level)
+
+        super().__init__((floor, walls, doors), transform=transform)
 
     def draw(self, model=identity(), **other_uniforms):
         super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape,
                      light_colors=self.light_colors, nb_colors=self.light_colors.shape[0],
-                     catmull=self.catmull, d_segt=.5, **other_uniforms)
+                     catmull=self.catmull, d_segt=1, **other_uniforms)
 
 
 def main():
     viewer = Viewer()
     shader = Shader("shaders/texture.vert", "shaders/scene.frag")
 
-    list_level = [[1, 1, 1, 1, 1],
-                  [1, 2, 0, 0, 1],
+    list_level = [[1, 3, 1, 1, 1],
+                  [1, 2, 0, 2, 3],
                   [1, 0, 1, 0, 1],
-                  [1, 0, 0, 2, 1],
+                  [3, 2, 0, 2, 1],
                   [1, 0, 0, 0, 1],
                   [1, 1, 1, 3, 1]]
     level = np.array(list_level)
