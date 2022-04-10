@@ -4,7 +4,7 @@
 in vec3 w_position, w_normal;
 
 // light spots
-uniform vec3 lights[10];
+uniform vec4 lights[10];
 uniform int nb_lights;
 uniform float d_segt;
 
@@ -56,9 +56,9 @@ void main() {
     vec4 phong = vec4(0, 0, 0, 1);
 
     for(int i=0; i < nb_lights; i++) {
-        float d_sq = dot(w_position - lights[i], w_position - lights[i]);
+        float d_sq = dot(w_position - lights[i].xyz, w_position - lights[i].xyz);
 
-        vec3 l = normalize(w_position - lights[i]);
+        vec3 l = normalize(w_position - lights[i].xyz);
         vec3 r = reflect(-l, n);
 
         vec3 light_color = hermite_spline(d_sq);
@@ -68,5 +68,7 @@ void main() {
         phong += vec4(k_a * light_color, 1);
     }
 
-    out_color = phong;
+    vec4 color = vec4(.02, .02, .02, 1);
+
+    out_color = .6 * phong + color;
 }
