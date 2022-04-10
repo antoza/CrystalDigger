@@ -72,6 +72,7 @@ class Spider(Node) :
         return
     
     def die(self) :
+        #animer une flaque de sang ?
         self.__del__()
 
     def walk(self, movement) :
@@ -131,8 +132,7 @@ class Minecart(Node) :
     def __init__(self, pos, rail = 3) :
         super().__init__()
         self.pos = pos
-        # TODO : modifier l'initialisation de l'orientation
-        self.rail = 3
+        self.init_angle(rail)
         self.etat = IDLE
     
     def move(self, movement, src_rail, dst_rail) :
@@ -167,3 +167,15 @@ class Minecart(Node) :
         #self.etat = (ROTATE, angle, rotation_center)
         while self.etat != IDLE :
             pass
+    
+    def init_angle(self, rail) :
+        if rail == 3 :
+            return
+        elif rail == 4 :
+            #rotate de 90°
+        elif rail in (5, 6) :
+            linear_roll((-1, 0))
+            rotative_roll((1, 0), rail)
+        else :
+            linear_roll((1, 0))
+            rotative_roll((-1, 0), rail)

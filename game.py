@@ -134,9 +134,9 @@ def change_entity(pos, value) :
 
 
 def spiders_moving(player_movement) :
-
     player_connexe = get_player_connexe()
     for spider in spiders :
+        #the spider can track the player and go towards him
         if spider.pos in player_connexe :
             best_movement = find_best_movement(spider.pos, player_connexe, player_movement)
             given_pos = position_after_move(spider.pos, best_movement)
@@ -146,6 +146,7 @@ def spiders_moving(player_movement) :
             if spider.pos == player.pos :
                 spider.attack()
                 player.die()
+        #the spider is pushed with a barrel or a minecart
         elif isinstance(entity_on(spider.pos), (Barrel, Minecart)):
             movement1 = player_movement
             movement2 = (-player_movement[1], player_movement[0])
@@ -156,6 +157,7 @@ def spiders_moving(player_movement) :
                     change_entity(pos, spider)
                     spider.move(movement)
                     return
+            #the spider can't go anywhere, this poor creature is crushed :'(
             spiders.remove(spider)
             spider.die()
 
