@@ -173,6 +173,7 @@ class Minecart(Node) :
             return
         elif rail == 4 :
             #rotate de 90°
+            return
         elif rail in (5, 6) :
             linear_roll((-1, 0))
             rotative_roll((1, 0), rail)
