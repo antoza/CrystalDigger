@@ -36,7 +36,7 @@ class Door(Node):
 
     def __init__(self, shader, transform=identity()):
         dark_slab = Slab(shader, "dark_wood.png")
-        slab = Slab(shader, "wood.png")
+        slab = Slab(shader, "planks.png")
 
         door_frame = generate_door_frame(dark_slab)
         self.door_leaf = Node(transform=translate(.3, .5, 0) @ rotate((0, 1, 0), 180) @ scale(.3, .5, .05))
