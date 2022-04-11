@@ -80,7 +80,6 @@ class Spider(Node):
         self.max_rotate = 5
         self.movement = (0, 0)
         self.angle = 0
-        self.available = True
 
 
     def draw(self, model=identity(), **other_uniforms):
@@ -101,7 +100,6 @@ class Spider(Node):
         else:
             self.pop_state()
             self.iterator = 0
-            self.available = True
 
     def rotate_iterator(self):
         if self.iterator == 0:
@@ -113,13 +111,11 @@ class Spider(Node):
         else:
             self.pop_state()
             self.iterator = 0
-            self.available = True
 
     def update_state(self, new_state):
         self.children[self.listState[self.states[0]]].display = False
         self.states.insert(0, new_state)
         self.children[self.listState[self.states[0]]].display = True
-        self.available = False
 
     def pop_state(self):
         #self.children[self.listState[self.states[0]]].display = False
@@ -128,25 +124,18 @@ class Spider(Node):
         glfw.set_time(0.0)
 
     def move(self, movement):
-        if not self.available:
-            return
         self.walk(movement)
-        self.available = True
         self.rotate(movement)
 
     def attack(self):
         self.update_state(ATTACK)
 
     def walk(self, movement):
-        if not self.available:
-            return
         self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         self.movement = movement
         self.update_state(WALK)
 
     def rotate(self, movement):
-        if not self.available:
-            return
         if movement[0] == self.orientation[0] or movement[1] == self.orientation[1]:
             if movement[0] == self.orientation[0] and movement[1] == self.orientation[1]:
                 self.angle = 0
@@ -160,23 +149,23 @@ class Spider(Node):
         self.orientation = movement
         if self.angle != 0:
             self.update_state(ROTATE)
-        else:
-            self.available = False
 
     def key_handler(self, key):
         """ Dispatch keyboard events to children with key handler """
-        if key == glfw.KEY_UP:
-            self.move((-1, 0))
-            #glfw.set_time(0.0)
-        if key == glfw.KEY_DOWN:
-            self.move((1, 0))
-            #glfw.set_time(0.0)
-        if key == glfw.KEY_LEFT:
-            self.move((0, -1))
-            #glfw.set_time(0.0)
-        if key == glfw.KEY_RIGHT:
-            self.move((0, 1))
-            #glfw.set_time(0.0)
+        if self.states[0] == IDLE:
+            if key == glfw.KEY_UP:
+                self.move((-1, 0))
+                #glfw.set_time(0.0)
+            if key == glfw.KEY_DOWN:
+                self.move((1, 0))
+                #glfw.set_time(0.0)
+            if key == glfw.KEY_LEFT:
+                self.move((0, -1))
+                #glfw.set_time(0.0)
+            if key == glfw.KEY_RIGHT:
+                self.move((0, 1))
+                #glfw.set_time(0.0)
+        
 
 
 class Ore(Node):
