@@ -31,9 +31,9 @@ def genere_ppm(file_name, points_array, size):
 
 def apply_noise(image, noise, size, step, f_sin=8):
     for i in range(size):
+        x = f_sin * step * i
         for j in range(size):
-            y = f_sin * step * j
-            perturbation = sin(y + f_sin * noise[i][j]) / 3
+            perturbation = sin(x + f_sin * noise[i][j]) / 3
             image[i][j][0] *= 1 + perturbation
             image[i][j][1] *= 1 + perturbation
             image[i][j][2] *= 1 + perturbation
@@ -65,7 +65,12 @@ def main(seed=0):
     dark_wood = [[[66, 40, 14] for _ in range(n_max)] for _ in range(n_max)]
     apply_noise(dark_wood, noise, n_max, step, f_sin=4)
 
+    # defining planks image
     planks = [[[175, 128, 87] for _ in range(n_max)] for _ in range(n_max)]
+    for i in range(n_max):
+        for j in range(n_max):
+            if j % (n_max // 10) in range(-2, 3):
+                planks[j][i] = [66, 40, 14]
 
     # For the planks, we work on the noise a little more to apply an offset to distinguish the different planks
     for p in range(5):
@@ -76,10 +81,11 @@ def main(seed=0):
                 x = freq_factor * f_noise * step * i
                 y = freq_factor * f_noise * step * j
                 offset = j % (n_max // 10)
+                # don't override the separation of the planks
                 if j % (n_max // 10) in range(-2, 3):
-                    noise[i][j] = -1
+                    noise[j][i] = 0
                 else:
-                    noise[i][j] += amp_factor * perlin.noise(x + y/8, y + offset)
+                    noise[j][i] += amp_factor * perlin.noise(x, y + offset)
 
     apply_noise(planks, noise, n_max, step, f_sin=4)
 
