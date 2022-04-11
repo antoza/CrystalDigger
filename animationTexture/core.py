@@ -391,7 +391,7 @@ class Viewer(Node):
     def on_key(self, _win, key, _scancode, action, _mods):
         """ 'Q' or 'Escape' quits """
         old = self.mouse
-        if action == glfw.PRESS:# or action == glfw.REPEAT:
+        if action == glfw.PRESS or action == glfw.REPEAT:
             if key == glfw.KEY_ESCAPE:
                 glfw.set_window_should_close(self.win, True)
             if key == glfw.KEY_Q:
@@ -400,7 +400,7 @@ class Viewer(Node):
                 glfw.set_time(0.0)
             self.key_handler(key)
 
-        if action == glfw.PRESS:# or action == glfw.REPEAT:
+        if action == glfw.PRESS or action == glfw.REPEAT:
             old = self.mouse
             if key == glfw.KEY_W:
                 self.trackball.zoom(1, glfw.get_window_size(_win)[1])
@@ -408,7 +408,7 @@ class Viewer(Node):
                 self.trackball.drag(old, (old[0] + 1, old[1] +10 ), glfw.get_window_size(_win)[1])
                 #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
 
-        if action == glfw.PRESS :#or action == glfw.REPEAT:
+        if action == glfw.PRESS or action == glfw.REPEAT:
             old = self.mouse
             if key == glfw.KEY_T:
                 self.mouse = (old[0], old[1] - 10)
