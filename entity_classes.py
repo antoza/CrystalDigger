@@ -62,7 +62,7 @@ class Player(Node):
 
 
 class Spider(Node):
-    def __init__(self, shader, light_dir=(0, 0, 0), pos=(0, 0), transform=identity(), orientation=(1, 0)):
+    def __init__(self, shader, light_dir=None, pos=(0, 0), transform=identity(), orientation=(1, 0)):
         super().__init__(transform=translate(pos[1], pos[0], 0) @ transform @ transform_spider)
         self.old_transform = translate(pos[1], pos[0], 0) @ transform
         self.pos = pos
