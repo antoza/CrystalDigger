@@ -62,7 +62,7 @@ class Player(Node):
 
 
 class Spider(Node):
-    def __init__(self, shader, light_dir, pos, transform, orientation=(1, 0)):
+    def __init__(self, shader, light_dir=(0, 0, 0), pos=(0, 0), transform=identity(), orientation=(1, 0)):
         super().__init__(transform=translate(pos[1], pos[0], 0) @ transform @ transform_spider)
         self.old_transform = translate(pos[1], pos[0], 0) @ transform
         self.pos = pos
@@ -265,20 +265,20 @@ def main():
     viewer = Viewer()
     shader = Shader("shaders/texture.vert", "shaders/scene.frag")
     spider_shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
-    list_level = [[0, 3, 1, 1, 1],
-                  [0, 2, 0, 2, 3],
-                  [0, 0, 1, 0, 1],
-                  [3, 2, 0, 2, 1],
+    list_level = [[1, 3, 1, 1, 1],
+                  [1, 0, 0, 2, 3],
+                  [1, 0, 1, 0, 1],
+                  [3, 0, 0, 0, 1],
                   [1, 0, 0, 0, 1],
                   [1, 1, 1, 3, 1]]
     level = np.array(list_level)
     x, y = level.shape
     scene = Scene(shader=shader, level=level, transform=translate(-x / 2, -y / 2, 0))
 
-    spider = Spider(shader=spider_shader, light_dir=(0, -1, 0), pos=(0, 0), transform=translate(0.5 - x / 2, 0.5 - y / 2, 0.1))
+    spider = Spider(shader=spider_shader, transform=translate(.5, .5, 0))
+    scene.add(spider)
 
     viewer.add(scene)
-    viewer.add(spider)
     viewer.run()
 
 

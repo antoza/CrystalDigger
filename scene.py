@@ -234,7 +234,7 @@ class Scene(Node):
     def draw(self, model=identity(), **other_uniforms):
         super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape,
                      light_colors=self.light_colors, nb_colors=self.light_colors.shape[0],
-                     catmull=self.catmull, d_segt=2, **other_uniforms)
+                     catmull=self.catmull, d_segt=1, **other_uniforms)
 
 
 def main():
