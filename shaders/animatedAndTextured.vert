@@ -26,7 +26,7 @@ void main() {
         skin_matrix += bone_weights[i] * bone_matrix[int(bone_ids[i])];
     }
 
-    vec4 w_position4 = skin_matrix * model * vec4(position, 1.0);
+    vec4 w_position4 = skin_matrix * vec4(position, 1.0);
 
     gl_Position = projection * view * w_position4;
 
