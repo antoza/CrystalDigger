@@ -242,11 +242,11 @@ class Minecart(Node):
             return
             #rotate de 90°
         elif rail in (5, 6):
-            linear_roll((-1, 0))
-            rotative_roll((1, 0), rail)
+            self.linear_roll((-1, 0))
+            self.rotative_roll((1, 0), rail)
         else:
-            linear_roll((1, 0))
-            rotative_roll((-1, 0), rail)
+            self.linear_roll((1, 0))
+            self.rotative_roll((-1, 0), rail)
 
 
 def main():
