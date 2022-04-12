@@ -32,7 +32,7 @@ vec3 hermite_spline(float d) {
 
     // If the fragment is too far, it is black
     if(d >= nb_colors * d_segt)
-        return vec3(0, 0, 0);
+        return vec3(1, 1, 1);
 
     int segment = int(d/d_segt);
 

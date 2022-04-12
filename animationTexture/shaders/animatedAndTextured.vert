@@ -28,7 +28,7 @@ void main() {
 
     vec4 w_position4 = skin_matrix * vec4(position, 1.0);
 
-    gl_Position = projection * view * model * w_position4;
+    gl_Position = projection * view * w_position4;
 
     // fragment position in world coordinates
     w_position = w_position4.xyz / w_position4.w;  // dehomogenize

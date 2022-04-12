@@ -68,6 +68,7 @@ class KeyFrameControlNode(Node):
         super().draw(primitives=primitives, **uniforms)
 
 
+# -------------- Linear Blend Skinning : TP7 ---------------------------------
 class Skinned:
     """ Skinned mesh decorator, passes bone world transforms to shader """
     def __init__(self, mesh, bone_nodes, bone_offsets):
@@ -76,8 +77,13 @@ class Skinned:
         # store skinning data
         self.bone_nodes = bone_nodes
         self.bone_offsets = np.array(bone_offsets, np.float32)
+        self.displayable = True
 
     def draw(self, **uniforms):
         world_transforms = [node.world_transform for node in self.bone_nodes]
         uniforms['bone_matrix'] = world_transforms @ self.bone_offsets
         self.mesh.draw(**uniforms)
+
+    def display(self, aff):
+        """ lol """
+        self.mesh.display(aff)

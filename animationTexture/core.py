@@ -148,11 +148,18 @@ class Mesh:
         self.shader = shader
         self.uniforms = uniforms or dict()
         self.vertex_array = VertexArray(shader, attributes, index)
+        self.displayable = True
 
     def draw(self, primitives=GL.GL_TRIANGLES, **uniforms):
+        if not self.displayable:
+            return
         GL.glUseProgram(self.shader.glid)
         self.shader.set_uniforms({**self.uniforms, **uniforms})
         self.vertex_array.execute(primitives)
+
+    def display(self, aff):
+        """ lol """
+        self.displayable = aff
 
 
 # ------------  Node is the core drawable for hierarchical scene graphs -------
@@ -162,7 +169,6 @@ class Node:
         self.transform = transform
         self.world_transform = identity()
         self.children = list(iter(children))
-        self.display = True
 
     def add(self, *drawables):
         """ Add drawables to this node, simply updating children list """
@@ -170,8 +176,6 @@ class Node:
 
     def draw(self, model=identity(), **other_uniforms):
         """ Recursive draw, passing down updated model matrix. """
-        if not self.display:
-            return
         self.world_transform = model @ self.transform
         for child in self.children:
             child.draw(model=self.world_transform, **other_uniforms)
@@ -180,6 +184,11 @@ class Node:
         """ Dispatch keyboard events to children with key handler """
         for child in (c for c in self.children if hasattr(c, 'key_handler')):
             child.key_handler(key)
+
+    def display(self, aff):
+        """  """
+        for child in self.children:
+            child.display(aff)
 
 
 # -------------- 3D resource loader -------------------------------------------
@@ -391,16 +400,15 @@ class Viewer(Node):
     def on_key(self, _win, key, _scancode, action, _mods):
         """ 'Q' or 'Escape' quits """
         old = self.mouse
-        if action == glfw.PRESS or action == glfw.REPEAT:
+        if action == glfw.PRESS:# or action == glfw.REPEAT:
             if key == glfw.KEY_ESCAPE:
                 glfw.set_window_should_close(self.win, True)
             if key == glfw.KEY_Q:
                 GL.glPolygonMode(GL.GL_FRONT_AND_BACK, next(self.fill_modes))
             if key == glfw.KEY_SPACE:
                 glfw.set_time(0.0)
-            self.key_handler(key)
 
-        if action == glfw.PRESS or action == glfw.REPEAT:
+        if action == glfw.PRESS:# or action == glfw.REPEAT:
             old = self.mouse
             if key == glfw.KEY_W:
                 self.trackball.zoom(1, glfw.get_window_size(_win)[1])
@@ -408,7 +416,7 @@ class Viewer(Node):
                 self.trackball.drag(old, (old[0] + 1, old[1] +10 ), glfw.get_window_size(_win)[1])
                 #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
 
-        if action == glfw.PRESS or action == glfw.REPEAT:
+        if action == glfw.PRESS :#or action == glfw.REPEAT:
             old = self.mouse
             if key == glfw.KEY_T:
                 self.mouse = (old[0], old[1] - 10)
