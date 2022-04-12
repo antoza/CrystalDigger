@@ -7,7 +7,7 @@ from core import *
 #           [1, 0, 4, 1, 4, 0, 1],
 #           [1, 0, 7, 3, 5, 0, 1],
 #           [1, 1, 1, 1, 1, 1, 1] ]
-
+"""
 solids = [ [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
            [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
            [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
@@ -36,7 +36,7 @@ entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
              [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ]
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ]"""
 #entities = [ [0, 0, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 4, 1, 0],
 #             [0, 0, 0, 0, 0, 1, 0],
@@ -44,17 +44,34 @@ entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 #             [0, 1, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 0, 0, 0] ]
 
+solids = [[1, 1, 1, 1, 1],
+            [1, 0, 0, 2, 1],
+            [1, 0, 1, 0, 1],
+            [1, 0, 1, 0, 1],
+            [1, 0, 1, 2, 3],
+            [1, 1, 1, 1, 1]]
+
+entities = [[0, 0, 0, 0, 0],
+            [0, 4, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 4, 0, 0, 0],
+            [0, 0, 0, 0, 0]]
+
+character_pos = (4, 3)
 # Values meaning:
 
 # value: solid
 # 0: void
 # 1: wall
-# 3: rails ═
-# 4: rails ║
-# 5: rails ╝
-# 6: rails ╗
-# 7: rails ╚
-# 8: rails ╔
+# 2: torch
+# 3: door
+# 4: rails ═
+# 5: rails ║
+# 6: rails ╝
+# 7: rails ╗
+# 8: rails ╚
+# 9: rails ╔
 
 # value: entity
 # 0: nothing
@@ -63,7 +80,7 @@ entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 # 3: minecart
 # 4: spider
 
-character_pos = (7, 6)
+#character_pos = (7, 6)
 
 class Game(Viewer):
     def __init__(self, solids, entities, character_pos):
@@ -71,24 +88,20 @@ class Game(Viewer):
         self.temporary_shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
         self.solids = solids
         self.shader = Shader("shaders/texture.vert", "shaders/scene.frag")
-        list_level = [[1, 3, 1, 1, 1],
-                    [1, 0, 0, 2, 3],
-                    [1, 0, 1, 0, 1],
-                    [3, 0, 2, 0, 1],
-                    [1, 0, 2, 0, 1],
-                    [1, 1, 1, 3, 1]]
-        level = np.array(list_level)
-        x, y = level.shape
-        self.scene = Scene(shader=self.shader, level=level, transform=translate(-x / 2, -y / 2, 0))
+        level = np.array(solids)
+        x,y = level.shape
+        self.scene = Scene(level=level, transform=translate(-y / 2, x / 2, 0))
         self.add(self.scene)
 
         self.entities = entities
         self.player = Player(character_pos)
         self.scene.add(self.player)
+        self.ores = 0
         self.spiders = []
         self.create_all_entities()
         self.waiting = True
         self.iterator = 0
+        self.game_over = False
 
     def run(self):
         """ Main render loop for this OpenGL window """
@@ -122,22 +135,26 @@ class Game(Viewer):
         given_pos = self.position_after_move(self.player.pos, movement)
         if self.solid_on(given_pos) == 1:
             return
+        if self.solid_on(given_pos) == 3 and self.ores > 0:
+            return
 
         entity = self.entity_on(given_pos)
         if entity == 0:
-            print("coucou")
             self.player.move(movement)
+            if self.solid_on(given_pos) == 3 and self.ores == 0:
+                self.game_over = True
 
         elif isinstance(entity, Ore):
             self.change_entity(given_pos, 0)
             self.player.mine(movement)
             entity.destroy()
+            self.ores -= 1
 
         elif isinstance(entity, Barrel):
             target_pos = self.position_after_move(given_pos, movement)
 
             # check if the entity can be pushed
-            if self.solid_on(target_pos) == 1:
+            if self.solid_on(target_pos) == 1 or self.solid_on(target_pos) == 3:
                 return
             if self.entity_on(target_pos) != 0 and not isinstance(self.entity_on(target_pos), Spider):
                 return
@@ -151,7 +168,7 @@ class Game(Viewer):
             target_pos = self.position_after_move(given_pos, movement)
 
             # check if the entity can be pushed
-            if self.solid_on(target_pos) < 3:
+            if self.solid_on(target_pos) < 4:
                 return
             if self.entity_on(target_pos) != 0 and not isinstance(self.entity_on(target_pos), Spider):
                 return
@@ -165,6 +182,7 @@ class Game(Viewer):
             self.player.move(movement)
             entity.attack()
             self.player.die()
+            self.game_over = True
             return
         
         self.waiting = False
@@ -201,6 +219,7 @@ class Game(Viewer):
                 if spider.pos == self.player.pos:
                     spider.attack()
                     self.player.die()
+                    self.game_over = True
             #the spider is pushed with a barrel or a minecart
             elif isinstance(self.entity_on(spider.pos), (Barrel, Minecart)):
                 movement1 = player_movement
@@ -208,7 +227,7 @@ class Game(Viewer):
                 movement3 = (player_movement[1], -player_movement[0])
                 for movement in (movement1, movement2, movement3):
                     pos = self.position_after_move(spider.pos, movement)
-                    if not (self.solid_on(pos) == 1 or isinstance(self.entity_on(pos), (Ore, Barrel, Minecart))):
+                    if not (self.solid_on(pos) == 1 or self.solid_on(pos) == 3 or isinstance(self.entity_on(pos), (Ore, Barrel, Minecart))):
                         self.change_entity(pos, spider)
                         spider.move(movement)
                         return
@@ -235,7 +254,7 @@ class Game(Viewer):
         for i in range(len(self.solids)):
             bline = []
             for j in range(len(self.solids[0])):
-                if self.solid_on((i,j)) == 1 or isinstance(self.entity_on((i,j)), (Ore, Barrel, Minecart)):
+                if self.solid_on((i,j)) == 1 or self.solid_on((i,j)) == 3 or isinstance(self.entity_on((i,j)), (Ore, Barrel, Minecart)):
                     bline.append(1)
                 else:
                     bline.append(0)
@@ -288,7 +307,7 @@ class Game(Viewer):
 
     def key_handler(self, key):
         """ Dispatch keyboard events to children with key handler """
-        if self.waiting:
+        if self.waiting and not self.game_over:
             if key == glfw.KEY_UP:
                 self.change_board((-1, 0))
                 #glfw.set_time(0.0)
@@ -344,6 +363,7 @@ class Game(Viewer):
                 if entity != 0:
                     """if entity == 1:
                         self.change_entity((i,j), Ore((i,j)))
+                        self.ores += 1
                     if entity == 2:
                         self.change_entity((i,j), Barrel((i,j)))
                     if entity == 3:

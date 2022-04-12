@@ -17,8 +17,8 @@ ATTACK = 3
 class Creature(Node):
     def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(), base_transform=identity(), orientation=(1, 0),
                  listState={}):
-        super().__init__(transform=translate(pos[1], -pos[0], 0) @ transform @ base_transform)
-        self.old_transform = translate(pos[1], -pos[0], 0) @ transform
+        super().__init__(transform=translate(pos[1]+.5, -pos[0]-.5, 0) @ transform @ base_transform)
+        self.old_transform = translate(pos[1]+.5, -pos[0]-.5, 0) @ transform
         self.base_transform = base_transform
         self.pos = pos
         self.orientation = orientation
@@ -199,7 +199,7 @@ class Minecart(Node):
     def move(self, movement, src_rail, dst_rail):
         self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         for rail in (src_rail, dst_rail):
-            if rail in (3, 4):
+            if rail in (4, 5):
                 self.linear_roll(movement)
             else:
                 self.rotative_roll(movement, rail)
@@ -211,15 +211,15 @@ class Minecart(Node):
 
     def rotative_roll(self, movement, rail):
         if movement[0] == -1:
-            trigo_rotation = rail in (5, 6)
+            trigo_rotation = rail in (6, 7)
         if movement[0] == 1:
-            trigo_rotation = rail in (7, 8)
+            trigo_rotation = rail in (8, 9)
         if movement[1] == -1:
-            trigo_rotation = rail in (6, 8)
+            trigo_rotation = rail in (7, 9)
         if movement[1] == 1:
-            trigo_rotation = rail in (5, 7)
+            trigo_rotation = rail in (6, 8)
 
-        rotation_center = ((rail - 5) % 2 - 1 / 2, (rail - 5) // 2 - 1 / 2)
+        rotation_center = ((rail - 6) % 2 - 1 / 2, (rail - 6) // 2 - 1 / 2)
         if trigo_rotation:
             angle = 45
         else:
@@ -230,12 +230,12 @@ class Minecart(Node):
             pass
 
     def init_angle(self, rail):
-        if rail == 3:
+        if rail == 4:
             return
-        elif rail == 4:
+        elif rail == 5:
             return
             # rotate de 90°
-        elif rail in (5, 6):
+        elif rail in (6, 7):
             self.linear_roll((-1, 0))
             self.rotative_roll((1, 0), rail)
         else:
