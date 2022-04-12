@@ -110,27 +110,27 @@ def generate_doors(shader, level):
                 # right door
                 if level[i_near[0]][j] != 1:
                     r = rotate((0, 0, 1), -90)
-                    t = translate((i + 1, j + 1, 0))
+                    t = translate((i, j + 1, 0))
                     door.transform = t @ r @ door.transform
                     door.add(Door(shader))
 
                 # left door
                 elif level[i_near[1]][j] != 1:
                     r = rotate((0, 0, 1), 90)
-                    t = translate((i, j, 0))
+                    t = translate((i + 1, j, 0))
                     door.transform = t @ r @ door.transform
                     door.add(Door(shader))
 
                 # lower door
                 elif level[i][j_near[0]] != 1:
-                    t = translate((i, j + 1, 0))
+                    t = translate((i, j, 0))
                     door.transform = t @ door.transform
                     door.add(Door(shader))
 
                 # upper door
                 elif level[i][j_near[1]] != 1:
                     r = rotate((0, 0, 1), 180)
-                    t = translate((i + 1, j, 0))
+                    t = translate((i + 1, j + 1, 0))
                     door.transform = t @ r @ door.transform
                     door.add(Door(shader))
 
@@ -238,8 +238,8 @@ def main():
     viewer = Viewer()
 
     list_level = [[1, 3, 1, 1, 1],
-                  [1, 0, 2, 0, 3],
-                  [1, 0, 0, 0, 1],
+                  [1, 0, 2, 0, 1],
+                  [1, 0, 0, 0, 3],
                   [3, 0, 0, 0, 1],
                   [1, 2, 1, 0, 1],
                   [1, 1, 1, 3, 1]]
