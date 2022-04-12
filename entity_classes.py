@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
-from core import *
-from transform import *
+
+
+import glfw
+import numpy as np
+
+from core import Node, Shader, Viewer, load
+from transform import translate, rotate, scale, identity
 from scene import Scene
 
 IDLE = 0
@@ -247,11 +252,11 @@ def main():
                   [0, 2, 0, 2, 3],
                   [0, 0, 1, 0, 1],
                   [3, 2, 0, 2, 1],
-                  [1, 0, 0, 0, 1],
+                  [1, 2, 2, 2, 1],
                   [1, 1, 1, 3, 1]]
     level = np.array(list_level)
     x, y = level.shape
-    scene = Scene(level=level, transform=translate(-x / 2, -y / 2, 0))
+    scene = Scene(level=level, transform=translate(y / 2, -x / 2, 0))
 
     player = Player(pos=(1, 0), transform=translate(0.5 - x / 2, 0.5 - y / 2, 0.1))
     spider = Spider(pos=(0, 0), transform=translate(0.5 - x / 2, 0.5 - y / 2, 0.1))
