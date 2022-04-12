@@ -32,15 +32,25 @@ def generate_door_frame(slab):
     return frame
 
 
+class Torch(Node):
+
+    def __init__(self, shader, transform=identity()):
+        slab = Slab(shader, "dark_wood.png")
+        rod = Node(transform=rotate((1, 0, 0), 90) @ translate(0, .5, 0) @ scale(.1, .5, .1))
+        rod.add(slab)
+
+        super().__init__([rod])
+
+
 class Door(Node):
 
     def __init__(self, shader, transform=identity()):
         dark_slab = Slab(shader, "dark_wood.png")
-        slab = Slab(shader, "planks.png")
+        leaf = Slab(shader, "planks.png")
 
         door_frame = generate_door_frame(dark_slab)
         self.door_leaf = Node(transform=translate(.3, .5, 0) @ rotate((0, 1, 0), 180) @ scale(.3, .5, .05))
-        self.door_leaf.add(slab)
+        self.door_leaf.add(leaf)
         self.angle = 0
         self.target_angle = 0
         self.opened = False

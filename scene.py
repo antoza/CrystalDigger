@@ -7,7 +7,7 @@ from core import Shader, Viewer, Node
 from transform import rotate, translate, scale, vec, identity
 
 from surface import Surface
-from door import Door, Slab
+from door import Door, Slab, Torch
 from color import fire, catmull_derivatives
 
 
@@ -150,10 +150,6 @@ def generate_torches(shader, level):
     lights = []
     scene_torches = Node()
 
-    slab = Slab(shader, "dark_wood.png")
-    single_torch = Node(transform=rotate((1, 0, 0), 90) @ translate(0, .5, 0) @ scale(.1, .5, .1))
-    single_torch.add(slab)
-
     scaling = scale(.2, .2, .2)
 
     for i in range(x):
@@ -170,7 +166,7 @@ def generate_torches(shader, level):
                     r = rotate((0, 1, 0), 30)
                     t = translate((i, j + .5, .5))
                     torch = Node(transform=t@r@scaling)
-                    torch.add(single_torch)
+                    torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
                     lights.append(t @ r @ scaling @ vec(0, 0, 1, 1))
@@ -180,7 +176,7 @@ def generate_torches(shader, level):
                     r = rotate((0, 1, 0), -30)
                     t = translate((i + 1, j + .5, .5))
                     torch = Node(transform=t @ r @ scaling)
-                    torch.add(single_torch)
+                    torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
                     lights.append(t @ r @ scaling @ vec(0, 0, 1, 1))
@@ -190,7 +186,7 @@ def generate_torches(shader, level):
                     r = rotate((1, 0, 0), -30)
                     t = translate((i + .5, j, .5))
                     torch = Node(transform=t @ r @ scaling)
-                    torch.add(single_torch)
+                    torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
                     lights.append(t @ r @ scaling @ vec(0, 0, 1, 1))
@@ -200,7 +196,7 @@ def generate_torches(shader, level):
                     r = rotate((1, 0, 0), 30)
                     t = translate((i + .5, j + 1, .5))
                     torch = Node(transform=t @ r @ scaling)
-                    torch.add(single_torch)
+                    torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
                     lights.append(t @ r @ scaling @ vec(0, 0, 1, 1))
@@ -211,7 +207,8 @@ def generate_torches(shader, level):
 
 class Scene(Node):
 
-    def __init__(self, shader, level, transform=identity()):
+    def __init__(self, level, transform=identity()):
+        surf_shader = Shader("shaders/texture.vert", "shaders/scene.frag")
         shader_wood = Shader("shaders/texture.vert", "shaders/texture.frag")
         torches, self.lights_pos = generate_torches(shader_wood, level)
         for i in range(len(self.lights_pos)):
@@ -220,8 +217,8 @@ class Scene(Node):
         self.light_colors = fire
         self.catmull = catmull_derivatives(fire, .5)
 
-        wall_tile = Surface(shader, n_x=50, n_y=50, amp=2, f=.1)
-        floor_tile = Surface(shader, n_x=50, n_y=50, amp=.1)
+        wall_tile = Surface(surf_shader, n_x=50, n_y=50, amp=2, f=.1)
+        floor_tile = Surface(surf_shader, n_x=50, n_y=50, amp=.1)
 
         floor = generate_floor(floor_tile, level)
         walls = generate_walls(wall_tile, level)
@@ -239,7 +236,6 @@ class Scene(Node):
 
 def main():
     viewer = Viewer()
-    shader = Shader("shaders/texture.vert", "shaders/scene.frag")
 
     list_level = [[1, 3, 1, 1, 1],
                   [1, 0, 2, 0, 3],
@@ -250,7 +246,7 @@ def main():
     level = np.array(list_level)
     x, y = level.shape
 
-    scene = Scene(shader, level, transform=translate(-x / 2, -y / 2, 0))
+    scene = Scene(level, transform=translate(-x / 2, -y / 2, 0))
     viewer.add(scene)
     viewer.run()
 
