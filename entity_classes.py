@@ -11,8 +11,8 @@ ATTACK = 3
 
 class Creature(Node):
     def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(), base_transform=identity(), orientation=(1, 0), listState={}):
-        super().__init__(transform=translate(pos[1], pos[0], 0) @ transform @ base_transform)
-        self.old_transform = translate(pos[1], pos[0], 0) @ transform
+        super().__init__(transform=translate(pos[1], -pos[0], 0) @ transform @ base_transform)
+        self.old_transform = translate(pos[1], -pos[0], 0) @ transform
         self.base_transform = base_transform
         self.pos = pos
         self.orientation = orientation
