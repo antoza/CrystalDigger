@@ -74,7 +74,7 @@ def surface_mesh(shader, amp=1, n_x=30, n_y=30, f=.2):
     for n in range(6 * n_x * n_y):
         indices.append(n)
 
-    uniforms = dict({"k_a": (.4, .4, .4), "k_d": (.4, .4, .4), "k_s": (.4, .4, .4), "s": 100})
+    uniforms = dict({"k_a": (.25, .20725, .20725), "k_d": (.4, .4, .4), "k_s": (.4, .4, .4), "s": 100})
     return Mesh(shader, attributes=dict(position=np.array(vert), normal=np.array(normals)),
                 index=np.array(indices), uniforms=uniforms)
 

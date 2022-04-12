@@ -70,5 +70,5 @@ void main() {
 
     vec4 color = vec4(.02, .02, .02, 1);
 
-    out_color = .6 * phong + color;
+    out_color = phong + .2 * vec4(k_a, 1);
 }
