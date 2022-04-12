@@ -30,10 +30,10 @@ def generate_wagon(slab):
     right = Node(transform=translate(.91, .5, .5) @ rotate((0, 1, 0), -80) @ scale(.3, .3, .05))
     right.add(slab)
 
-    down = Node(transform=translate(.5, .19, .5) @ rotate((1, 0, 0), -80) @ scale(.4, .3, .05))
+    down = Node(transform=translate(.5, .19, .5) @ rotate((1, 0, 0), -90) @ scale(.4, .3, .05))
     down.add(slab)
 
-    up = Node(transform=translate(.5, .81, .5) @ rotate((1, 0, 0), 80) @ scale(.4, .3, .05))
+    up = Node(transform=translate(.5, .81, .5) @ rotate((1, 0, 0), 90) @ scale(.4, .3, .05))
     up.add(slab)
 
     frame.add(bottom)
@@ -49,16 +49,21 @@ class Minecart(Node):
 
     def __init__(self, shader, transform=identity()):
         iron = Slab(shader, "iron.png")
-        wood = Slab(shader, "planks.png")
+        wood = Cylinder(shader, "dark_wood.png")
 
         iron_wagon = generate_wagon(iron)
+        self.wheels = []
+        for x in (.15, .85):
+            for y in (.20, .80):
+                self.wheels.append(Node(transform=translate(x, y, .1) @ scale(.15, .1, .15)))
+                self.wheels[-1].add(wood)
         #self.door_leaf = Node(transform=translate(.3, .5, 0) @ rotate((0, 1, 0), 180) @ scale(.3, .5, .05))
         #self.door_leaf.add(slab)
         #self.angle = 0
         #self.target_angle = 0
         #self.opened = False
 
-        super().__init__([iron_wagon], transform=transform)
+        super().__init__([iron_wagon] + self.wheels, transform=transform)
 
    # def key_handler(self, key):
    #     if key == glfw.KEY_O:

@@ -190,7 +190,7 @@ class Barrel(Node):
 
 
 class Minecart(Node):
-    def __init__(self, pos, rail=3):
+    def __init__(self, pos, rail=4):
         super().__init__()
         self.pos = pos
         self.init_angle(rail)

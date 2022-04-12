@@ -72,7 +72,7 @@ class Rails(Node):
 
     def __init__(self, shader, rail_type, transform=identity()):
         bar_slab = Slab(shader, "iron.png")
-        wood_slab = Slab(shader, "dark_wood.png")
+        wood_slab = Slab(shader, "oak.png")
 
         if rail_type == 4:
             rail = straight_rail(bar_slab, wood_slab)
@@ -107,7 +107,7 @@ def main():
     viewer = Viewer()
     shader = Shader("shaders/texture.vert", "shaders/materialTexture.frag")
 
-    viewer.add(Rails(shader, rail_type=3))
+    viewer.add(Rails(shader, rail_type=4))
     viewer.run()
 
 
