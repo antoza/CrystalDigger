@@ -45,3 +45,7 @@ class Textured:
             GL.glBindTexture(texture.type, texture.glid)
             uniforms[name] = index
         self.drawable.draw(primitives=primitives, **uniforms)
+
+    def display(self, aff):
+        """ lol """
+        self.drawable.display(aff)

@@ -7,7 +7,7 @@ IDLE = 0
 WALK = 1
 ROTATE = 2
 ATTACK = 3
-transform_spider = rotate(axis=(1., 0., 0.), angle=45) @ scale(0.008, 0.008, 0.008)
+transform_spider = rotate(axis=(1., 0., 0.), angle=67.5) @ scale(0.008, 0.008, 0.008)
 
 class Player(Node):
     def __init__(self, pos, orientation = (1, 0)):
@@ -72,81 +72,70 @@ class Spider(Node):
         for way in ["Spider/Spider_Idle.fbx", "Spider/Spider_run.fbx", "Spider/Spider_attack_1.fbx"]:
             child = Node()
             child.add(*load(way, shader, light_dir=light_dir))
-            child.display = False
+            child.display(False)
             self.add(child)
-        self.children[self.listState[IDLE]].display = True
+        self.children[self.listState[IDLE]].display(True)
         self.iterator = 0
-        self.max_walk = 6
-        self.max_rotate = 5
+        self.max_walk = 10
+        self.max_rotate = 10
+        self.max_idle = 10
         self.movement = (0, 0)
         self.angle = 0
-        self.available = True
 
 
     def draw(self, model=identity(), **other_uniforms):
-        if(self.states[0] == WALK):
+        if self.iterator == 0:
+            glfw.set_time(0.0)
+        if(self.states[-1] == WALK):
             self.walk_iterator()
-        elif(self.states[0] == ROTATE):
+        elif(self.states[-1] == ROTATE):
             self.rotate_iterator()
-        
+
         super().draw(model=model, **other_uniforms)
 
     def walk_iterator(self):
-        if self.iterator == 0:
-            glfw.set_time(0.0)
         if self.iterator < self.max_walk:
             self.old_transform = translate(self.movement[1]/self.max_walk, -self.movement[0]/self.max_walk, 0) @ self.old_transform
             self.transform = self.old_transform @ transform_spider
             self.iterator += 1
-        else:
-            self.pop_state()
-            self.iterator = 0
-            self.available = True
+            return
+
+        self.pop_state()
+        self.iterator = 0
 
     def rotate_iterator(self):
-        if self.iterator == 0:
-            glfw.set_time(0.0)
         if self.iterator < self.max_rotate:
             self.old_transform = self.old_transform @ rotate(axis=(0., 0., 1.), angle=self.angle/self.max_rotate)
             self.transform = self.old_transform @ transform_spider
             self.iterator += 1
-        else:
-            self.pop_state()
-            self.iterator = 0
-            self.available = True
+            return
+
+        self.pop_state()
+        self.iterator = 0
 
     def update_state(self, new_state):
-        self.children[self.listState[self.states[0]]].display = False
-        self.states.insert(0, new_state)
-        self.children[self.listState[self.states[0]]].display = True
-        self.available = False
+        self.children[self.listState[self.states[-1]]].display(False)
+        self.states.append(new_state)
+        self.children[self.listState[self.states[-1]]].display(True)
 
     def pop_state(self):
-        #self.children[self.listState[self.states[0]]].display = False
-        self.states.pop(0)
-        #self.children[self.listState[self.states[0]]].display = True
-        glfw.set_time(0.0)
+        self.children[self.listState[self.states[-1]]].display(False)
+        self.states.pop()
+        self.children[self.listState[self.states[-1]]].display(True)
 
     def move(self, movement):
-        if not self.available:
-            return
         self.walk(movement)
-        self.available = True
         self.rotate(movement)
 
     def attack(self):
         self.update_state(ATTACK)
 
     def walk(self, movement):
-        if not self.available:
-            return
         self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
         self.movement = movement
         self.update_state(WALK)
 
     def rotate(self, movement):
-        if not self.available:
-            return
         if movement[0] == self.orientation[0] or movement[1] == self.orientation[1]:
             if movement[0] == self.orientation[0] and movement[1] == self.orientation[1]:
                 self.angle = 0
@@ -160,23 +149,17 @@ class Spider(Node):
         self.orientation = movement
         if self.angle != 0:
             self.update_state(ROTATE)
-        else:
-            self.available = False
 
     def key_handler(self, key):
         """ Dispatch keyboard events to children with key handler """
         if key == glfw.KEY_UP:
             self.move((-1, 0))
-            #glfw.set_time(0.0)
         if key == glfw.KEY_DOWN:
             self.move((1, 0))
-            #glfw.set_time(0.0)
         if key == glfw.KEY_LEFT:
             self.move((0, -1))
-            #glfw.set_time(0.0)
         if key == glfw.KEY_RIGHT:
             self.move((0, 1))
-            #glfw.set_time(0.0)
 
 
 class Ore(Node):
