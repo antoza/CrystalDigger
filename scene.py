@@ -23,7 +23,7 @@ def generate_floor(surface, level):
 
     scaling_factor = min(1 / sx, 1 / sy)
     s = scale(scaling_factor, scaling_factor, scaling_factor)
-    floor = Node(transform=rotate((0, 0, 1), 90))
+    floor = Node(transform=rotate((0, 0, 1), -90))
 
     for i in range(x):
         for j in range(y):
@@ -51,7 +51,7 @@ def generate_walls(surface, level):
 
     scaling_factor = min(1 / sx, 1 / sy)
     s = scale(scaling_factor, scaling_factor, scaling_factor)
-    walls = Node(transform=rotate((0, 0, 1), 90))
+    walls = Node(transform=rotate((0, 0, 1), -90))
 
     for i in range(x):
         for j in range(y):
@@ -97,7 +97,7 @@ def generate_walls(surface, level):
 def generate_doors(shader, level):
     x, y = level.shape
 
-    doors = Node(transform=rotate((0, 0, 1), 90))
+    doors = Node(transform=rotate((0, 0, 1), -90))
 
     for i in range(x):
         for j in range(y):
@@ -110,27 +110,27 @@ def generate_doors(shader, level):
                 # right door
                 if level[i_near[0]][j] != 1:
                     r = rotate((0, 0, 1), -90)
-                    t = translate((i + 1, j + 1, 0))
+                    t = translate((i, j + 1, 0))
                     door.transform = t @ r @ door.transform
                     door.add(Door(shader))
 
                 # left door
                 elif level[i_near[1]][j] != 1:
                     r = rotate((0, 0, 1), 90)
-                    t = translate((i, j, 0))
+                    t = translate((i + 1, j, 0))
                     door.transform = t @ r @ door.transform
                     door.add(Door(shader))
 
                 # lower door
                 elif level[i][j_near[0]] != 1:
-                    t = translate((i, j + 1, 0))
+                    t = translate((i, j, 0))
                     door.transform = t @ door.transform
                     door.add(Door(shader))
 
                 # upper door
                 elif level[i][j_near[1]] != 1:
                     r = rotate((0, 0, 1), 180)
-                    t = translate((i + 1, j, 0))
+                    t = translate((i + 1, j + 1, 0))
                     door.transform = t @ r @ door.transform
                     door.add(Door(shader))
 
@@ -148,7 +148,7 @@ def generate_torches(shader, level):
     """
     x, y = level.shape
     lights = []
-    scene_torches = Node(transform=rotate((0, 0, 1), 90))
+    scene_torches = Node(transform=rotate((0, 0, 1), -90))
 
     scaling = scale(.2, .2, .2)
 
@@ -169,7 +169,7 @@ def generate_torches(shader, level):
                     torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
-                    lights.append(rotate((0, 0, 1), 90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
+                    lights.append(rotate((0, 0, 1), -90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
 
                 # right wall
                 if level[i_near[1]][j] == 1:
@@ -179,7 +179,7 @@ def generate_torches(shader, level):
                     torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
-                    lights.append(rotate((0, 0, 1), 90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
+                    lights.append(rotate((0, 0, 1), -90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
 
                 # lower wall
                 if level[i][j_near[0]] == 1:
@@ -189,7 +189,7 @@ def generate_torches(shader, level):
                     torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
-                    lights.append(rotate((0, 0, 1), 90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
+                    lights.append(rotate((0, 0, 1), -90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
 
                 # upper wall
                 if level[i][j_near[1]] == 1:
@@ -199,7 +199,7 @@ def generate_torches(shader, level):
                     torch.add(Torch(shader))
                     torches.add(torch)
                     # add the new light source to the list
-                    lights.append(rotate((0, 0, 1), 90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
+                    lights.append(rotate((0, 0, 1), -90) @ t @ r @ scaling @ vec(0, 0, 1, 1))
                 scene_torches.add(torches)
 
     return scene_torches, np.array(lights)
@@ -238,8 +238,8 @@ def main():
     viewer = Viewer()
 
     list_level = [[1, 3, 1, 1, 1],
-                  [1, 0, 2, 0, 3],
-                  [1, 0, 0, 0, 1],
+                  [1, 0, 2, 0, 1],
+                  [1, 0, 0, 0, 3],
                   [3, 0, 0, 0, 1],
                   [1, 2, 1, 0, 1],
                   [1, 1, 1, 3, 1]]

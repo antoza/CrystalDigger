@@ -72,39 +72,42 @@ class Rails(Node):
 
     def __init__(self, shader, rail_type, transform=identity()):
         bar_slab = Slab(shader, "iron.png")
-        wood_slab = Slab(shader, "wood.png")
+        wood_slab = Slab(shader, "oak.png")
 
-        if rail_type == 3:
+        if rail_type == 4:
             rail = straight_rail(bar_slab, wood_slab)
             node = Node(transform=translate(1, 0, 0) @ rotate((0, 0, 1), 90))
             node.add(rail)
-        if rail_type == 4:
-            node = straight_rail(bar_slab, wood_slab)
         if rail_type == 5:
+            node = straight_rail(bar_slab, wood_slab)
+        if rail_type == 6:
             rail = curved_rail(bar_slab, wood_slab)
             node = Node(transform=translate(0, 1, 0) @ rotate((0, 0, 1), -90))
             node.add(rail)
-        if rail_type == 6:
-            node = curved_rail(bar_slab, wood_slab)
         if rail_type == 7:
+            node = curved_rail(bar_slab, wood_slab)
+        if rail_type == 8:
             rail = curved_rail(bar_slab, wood_slab)
             node = Node(transform=translate(1, 1, 0) @ rotate((0, 0, 1), 180))
             node.add(rail)
-        if rail_type == 8:
+        if rail_type == 9:
             rail = curved_rail(bar_slab, wood_slab)
             node = Node(transform=translate(1, 0, 0) @ rotate((0, 0, 1), 90))
             node.add(rail)
 
         super().__init__([node], transform=transform)
+    
+    def draw(self, model=identity(), **other_uniforms):
+        super().draw(light_dir=(0, 0, 1), k_a=(.4, .4, .4) , k_d=(.4, .4, .4) , k_s=(.4, .4, .4), s=100, model=model, **other_uniforms)
 
 
 
 
 def main():
     viewer = Viewer()
-    shader = Shader("shaders/texture.vert", "shaders/texture.frag")
+    shader = Shader("shaders/texture.vert", "shaders/materialTexture.frag")
 
-    viewer.add(Rails(shader, rail_type=3))
+    viewer.add(Rails(shader, rail_type=4))
     viewer.run()
 
 

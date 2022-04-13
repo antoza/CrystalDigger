@@ -18,6 +18,7 @@ uniform float s;
 // world camera position
 uniform vec3 w_camera_position;
 
+in vec2 frag_tex_coords;
 out vec4 out_color;
 
 void main() {
@@ -30,5 +31,6 @@ void main() {
     vec3 specular_color = k_s * pow(max(0, dot(r, v)), s*128);
     vec4 phong = vec4(k_a + diffuse_color + specular_color, 1);
 
-    out_color = phong;
+    vec4 color = texture(diffuse_map, frag_tex_coords);
+    out_color = color * phong;
 }
