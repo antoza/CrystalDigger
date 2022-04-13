@@ -10,13 +10,13 @@ class Slab(Textured):
     """ Very simple cylinder based on provided load function """
 
     def __init__(self, shader, tex_file):
-        super().__init__(*load('slab.obj', shader), textures=Texture(tex_file))
+        super().__init__(*load('src/slab.obj', shader), textures=Texture(tex_file))
 
 class Cylinder(Textured):
     """ Very simple cylinder based on provided load function """
 
     def __init__(self, shader, tex_file):
-        super().__init__(*load('cylinder.obj', shader), textures=Texture(tex_file))
+        super().__init__(*load('src/cylinder.obj', shader), textures=Texture(tex_file))
 
 def generate_wagon(slab):
     frame = Node()
@@ -48,8 +48,8 @@ def generate_wagon(slab):
 class Minecart(Node):
 
     def __init__(self, shader, transform=identity()):
-        iron = Slab(shader, "iron.png")
-        wood = Cylinder(shader, "dark_wood.png")
+        iron = Slab(shader, "src/iron.png")
+        wood = Cylinder(shader, "src/dark_wood.png")
 
         iron_wagon = generate_wagon(iron)
         self.wheels = []
