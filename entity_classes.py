@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 import glfw
 import numpy as np
 
@@ -15,10 +14,11 @@ ATTACK = 3
 
 
 class Creature(Node):
-    def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(), base_transform=identity(), orientation=(1, 0),
-                 listState={}):
-        super().__init__(transform=translate(pos[1]+.5, -pos[0]-.5, 0) @ transform @ base_transform)
-        self.old_transform = translate(pos[1]+.5, -pos[0]-.5, 0) @ transform
+    def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(),
+                 base_transform=identity(), orientation=(1, 0), listState={}):
+        super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, 0)
+                         @ transform @ base_transform)
+        self.old_transform = translate(pos[1] + .5, -pos[0] - .5, 0) @ transform
         self.base_transform = base_transform
         self.pos = pos
         self.orientation = orientation
@@ -163,17 +163,16 @@ class Spider(Creature):
 
 
 class Ore(Node):
-    def __init__(self, pos):
-        super().__init__()
+    def __init__(self, pos=(0, 0), transform=identity()):
+        shader = Shader("shaders/textured.vert", "shaders/textured.frag")
+        self.base_transform = translate(0, 0, .5) @ rotate((1,0,0),90) @ scale(.1, .1, .1)
         self.pos = pos
-        self.etat = IDLE
+        super().__init__(transform=translate(pos[1]+.5, -pos[0]-.5, 0) @ transform @ self.base_transform)
+        self.states = [IDLE]
+        self.add(*load(file="src/crystal/Crystals.obj", tex_file="src/crystal/Tex1.png", shader=shader, light_dir=(0,0,1)))
 
     def destroy(self):
-        # animation de destruction
-        self.__del__()
-
-    def __del__(self):
-        return
+        self.display(False)
 
 
 class Barrel(Node):
@@ -246,8 +245,7 @@ class Minecart(Node):
 def main():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer()
-    viewer.trackball.zoom(-20, glfw.get_window_size(viewer.win)[1])
-    shader = Shader("shaders/texture.vert", "shaders/scene.frag")
+    viewer.trackball.zoom(-50, glfw.get_window_size(viewer.win)[1])
     list_level = [[0, 3, 1, 1, 1],
                   [0, 2, 0, 2, 3],
                   [0, 0, 1, 0, 1],
@@ -256,13 +254,15 @@ def main():
                   [1, 1, 1, 3, 1]]
     level = np.array(list_level)
     x, y = level.shape
-    scene = Scene(level=level, transform=translate(y / 2, -x / 2, 0))
+    scene = Scene(level=level, transform=translate(-y / 2, x / 2, 0))
 
-    player = Player(pos=(1, 0), transform=translate(0.5 - x / 2, 0.5 - y / 2, 0.1))
-    spider = Spider(pos=(0, 0), transform=translate(0.5 - x / 2, 0.5 - y / 2, 0.1))
+    player = Player(pos=(4, 0), transform=translate(x / 2, y / 2, 0))
+    spider = Spider(pos=(5, 0), transform=translate(x / 2, y / 2, 0))
+    ore = Ore(pos=(6, 0), transform=translate(x / 2, y / 2, 0))
 
     scene.add(spider)
     scene.add(player)
+    scene.add(ore)
     viewer.add(scene)
     viewer.run()
 
