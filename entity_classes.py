@@ -123,7 +123,7 @@ class Creature(Node):
 class Player(Creature):
     def __init__(self, pos=(0, 0), transform=identity()):
         shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
-        ways = ["Knight/Knight_Idle.fbx", "Knight/Knight_run.fbx", "Knight/Knight_attack_2.fbx"]
+        ways = ["src/Knight/Knight_Idle.fbx", "src/Knight/Knight_run.fbx", "src/Knight/Knight_attack_2.fbx"]
         transform_knight = rotate(axis=(1., 0., 0.), angle=90) @ scale(0.003, 0.002, 0.003)
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_knight,
@@ -144,7 +144,7 @@ class Player(Creature):
 class Spider(Creature):
     def __init__(self, pos=(0, 0), transform=identity()):
         shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
-        ways = ["Spider/Spider_Idle.fbx", "Spider/Spider_run.fbx", "Spider/Spider_attack_1.fbx"]
+        ways = ["src/Spider/Spider_Idle.fbx", "src/Spider/Spider_run.fbx", "src/Spider/Spider_attack_1.fbx"]
         transform_spider = rotate(axis=(1., 0., 0.), angle=90) @ scale(0.008, 0.008, 0.008)
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_spider,

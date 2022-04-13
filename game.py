@@ -129,7 +129,7 @@ class Game(Viewer):
 
             # Poll for and process events
             glfw.poll_events()
-        
+
 
     def change_board(self, movement):
         given_pos = self.position_after_move(self.player.pos, movement)
@@ -158,7 +158,7 @@ class Game(Viewer):
                 return
             if self.entity_on(target_pos) != 0 and not isinstance(self.entity_on(target_pos), Spider):
                 return
-            
+
             self.change_entity(target_pos, entity)
             self.change_entity(given_pos, 0)
             self.player.push(movement)
@@ -172,7 +172,7 @@ class Game(Viewer):
                 return
             if self.entity_on(target_pos) != 0 and not isinstance(self.entity_on(target_pos), Spider):
                 return
-            
+
             self.change_entity(target_pos, entity)
             self.change_entity(given_pos, 0)
             self.player.push(movement)
@@ -184,7 +184,7 @@ class Game(Viewer):
             self.player.die()
             self.game_over = True
             return
-        
+
         self.waiting = False
         self.spiders_moving(movement)
         return
@@ -195,7 +195,7 @@ class Game(Viewer):
 
     def solid_on(self, pos):
         return self.solids[pos[0]][pos[1]]
-        
+
     def entity_on(self, pos):
         return self.entities[pos[0]][pos[1]]
 
@@ -375,13 +375,15 @@ class Game(Viewer):
                         self.scene.add(self.entity_on((i,j)))
                     else:
                         self.change_entity((i,j), 0)
-                
 
+
+def main():
+    game = Game(solids, entities, character_pos)
+    game.run()
 
 
 if __name__ == '__main__':
-    game = Game(solids, entities, character_pos)
-    game.run()
+    main()
 
     # create_all_entities()
     # while(player.alive):
