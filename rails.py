@@ -72,7 +72,7 @@ class Rails(Node):
 
     def __init__(self, shader, rail_type, transform=identity()):
         bar_slab = Slab(shader, "src/iron.png")
-        wood_slab = Slab(shader, "src/wood.png")
+        wood_slab = Slab(shader, "src/oak.png")
 
         if rail_type == 4:
             rail = straight_rail(bar_slab, wood_slab)
@@ -98,7 +98,7 @@ class Rails(Node):
         super().__init__([node], transform=transform)
 
     def draw(self, model=identity(), **other_uniforms):
-        super().draw(light_dir=(0, 0, 1), k_a=(.4, .4, .4) , k_d=(.4, .4, .4) , k_s=(.4, .4, .4), s=100, model=model, **other_uniforms)
+        super().draw(light_dir=(0, 0, -1), k_a=(.4, .4, .4) , k_d=(.4, .4, .4) , k_s=(.4, .4, .4), s=100, model=model, **other_uniforms)
 
 
 

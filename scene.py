@@ -8,6 +8,7 @@ from transform import rotate, translate, scale, vec, identity
 
 from surface import Surface
 from wall import Door, Torch
+from rails import Rails
 from color import fire, catmull_derivatives
 
 
@@ -138,6 +139,17 @@ def generate_doors(shader, level):
 
     return doors
 
+def generate_rails(shader, level):
+    x, y = level.shape
+
+    rails = Node(transform=rotate((0, 0, 1), -90))
+
+    for i in range(x):
+        for j in range(y):
+            if level[i][j] >= 4:
+                rails.add(Rails(shader, level[i][j], transform=translate(i, j, .1)))
+    return rails
+
 
 def generate_torches(shader, level):
     """
@@ -223,10 +235,13 @@ class Scene(Node):
         floor = generate_floor(floor_tile, level)
         walls = generate_walls(wall_tile, level)
 
+
         shader_wood = Shader("shaders/texture.vert", "shaders/texture.frag")
         doors = generate_doors(shader_wood, level)
+        shader_rails = Shader("shaders/texture.vert", "shaders/texture.frag")
+        rails = generate_rails(shader_rails, level)
 
-        super().__init__((floor, walls, doors, torches), transform=transform)
+        super().__init__((floor, walls, doors, torches, rails), transform=transform)
 
     def draw(self, model=identity(), **other_uniforms):
         super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape,
@@ -238,9 +253,9 @@ def main():
     viewer = Viewer()
 
     list_level = [[1, 3, 1, 1, 1],
-                  [1, 0, 2, 0, 1],
-                  [1, 0, 0, 0, 3],
-                  [3, 0, 0, 0, 1],
+                  [1, 8, 2, 0, 1],
+                  [1, 4, 0, 9, 3],
+                  [3, 6, 5, 7, 1],
                   [1, 2, 1, 0, 1],
                   [1, 1, 1, 3, 1]]
     level = np.array(list_level)
