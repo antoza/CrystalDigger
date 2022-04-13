@@ -107,7 +107,7 @@ def main():
     viewer = Viewer()
     shader = Shader("shaders/texture.vert", "shaders/materialTexture.frag")
 
-    viewer.add(Rails(shader, rail_type=4))
+    viewer.add(Rails(shader, rail_type=6))
     viewer.run()
 
 
