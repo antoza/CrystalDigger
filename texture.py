@@ -47,5 +47,4 @@ class Textured:
         self.drawable.draw(primitives=primitives, **uniforms)
 
     def display(self, aff):
-        """ lol """
         self.drawable.display(aff)

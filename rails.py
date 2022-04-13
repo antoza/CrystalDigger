@@ -10,7 +10,7 @@ class Slab(Textured):
     """ Very simple cylinder based on provided load function """
 
     def __init__(self, shader, tex_file):
-        super().__init__(*load('slab.obj', shader), textures=Texture(tex_file))
+        super().__init__(*load('src/slab.obj', shader), textures=Texture(tex_file))
 
 
 def straight_rail(bar_slab, plank_slab):
@@ -71,8 +71,8 @@ def curved_rail(bar_slab, plank_slab):
 class Rails(Node):
 
     def __init__(self, shader, rail_type, transform=identity()):
-        bar_slab = Slab(shader, "iron.png")
-        wood_slab = Slab(shader, "wood.png")
+        bar_slab = Slab(shader, "src/iron.png")
+        wood_slab = Slab(shader, "src/wood.png")
 
         if rail_type == 3:
             rail = straight_rail(bar_slab, wood_slab)

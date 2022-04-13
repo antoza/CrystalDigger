@@ -10,7 +10,7 @@ class Slab(Textured):
     """ Very simple cylinder based on provided load function """
 
     def __init__(self, shader, tex_file):
-        super().__init__(*load('slab.obj', shader), textures=Texture(tex_file))
+        super().__init__(*load('src/slab.obj', shader), textures=Texture(tex_file))
 
 
 def generate_door_frame(slab):
@@ -35,7 +35,7 @@ def generate_door_frame(slab):
 class Torch(Node):
 
     def __init__(self, shader, transform=identity()):
-        slab = Slab(shader, "dark_wood.png")
+        slab = Slab(shader, "src/dark_wood.png")
         rod = Node(transform=rotate((1, 0, 0), 90) @ translate(0, .5, 0) @ scale(.1, .5, .1))
         rod.add(slab)
 
@@ -45,8 +45,8 @@ class Torch(Node):
 class Door(Node):
 
     def __init__(self, shader, transform=identity()):
-        dark_slab = Slab(shader, "dark_wood.png")
-        leaf = Slab(shader, "planks.png")
+        dark_slab = Slab(shader, "src/dark_wood.png")
+        leaf = Slab(shader, "src/planks.png")
 
         door_frame = generate_door_frame(dark_slab)
         self.door_leaf = Node(transform=translate(.3, .5, 0) @ rotate((0, 1, 0), 180) @ scale(.3, .5, .05))

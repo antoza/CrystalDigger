@@ -89,8 +89,8 @@ def main(seed=0):
 
     apply_noise(planks, noise, n_max, step, f_sin=4)
 
-    genere_ppm("dark_wood.ppm", dark_wood, n_max)
-    genere_ppm("planks.ppm", planks, n_max)
+    genere_ppm("src/dark_wood.ppm", dark_wood, n_max)
+    genere_ppm("src/planks.ppm", planks, n_max)
 
 
 if __name__ == "__main__":
