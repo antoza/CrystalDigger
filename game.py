@@ -377,11 +377,13 @@ class Game(Viewer):
                         self.change_entity((i,j), 0)
                 
 
+def main():
+    game = Game(solids, entities, character_pos)
+    game.run()
 
 
 if __name__ == '__main__':
-    game = Game(solids, entities, character_pos)
-    game.run()
+    main()
 
     # create_all_entities()
     # while(player.alive):
