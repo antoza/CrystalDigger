@@ -36,7 +36,7 @@ class Torch(Node):
 
     def __init__(self, shader, transform=identity()):
         slab = Slab(shader, "dark_wood.png")
-        rod = Node(transform=rotate((1, 0, 0), 90) @ translate(0, .5, 0) @ scale(.1, .5, .1))
+        rod = Node(transform=transform @ rotate((1, 0, 0), 90) @ translate(0, .5, 0) @ scale(.1, .5, .1))
         rod.add(slab)
 
         super().__init__([rod])
@@ -81,8 +81,7 @@ class Door(Node):
 
         super().draw(model=model, k_a=(.4, .4, .4), k_d=(.4, .4, .4), k_s=(.4, .4, .4), s=100, **other_uniforms)
 
-    def get_size(self):
-        return
+
 
 
 def main():
