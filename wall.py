@@ -81,8 +81,7 @@ class Door(Node):
 
         super().draw(model=model, k_a=(.4, .4, .4), k_d=(.4, .4, .4), k_s=(.4, .4, .4), s=100, **other_uniforms)
 
-    def get_size(self):
-        return
+
 
 
 def main():
