@@ -5,82 +5,6 @@ from load_game import load_from_txt
 from entity_classes import *
 from core import *
 
-#solids = [ [1, 1, 1, 1, 1, 1, 1],
-#           [1, 0, 4, 1, 0, 0, 1],
-#           [1, 0, 4, 1, 4, 0, 1],
-#           [1, 0, 4, 1, 4, 0, 1],
-#           [1, 0, 7, 3, 5, 0, 1],
-#           [1, 1, 1, 1, 1, 1, 1] ]
-"""
-solids = [ [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-           [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-           [1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
-           [1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
-           [1, 1, 0, 0, 1, 1, 0, 0, 0, 1],
-           [1, 3, 3, 0, 0, 0, 3, 3, 3, 1],
-           [1, 0, 0, 0, 0, 1, 0, 1, 1, 1],
-           [1, 0, 1, 0, 1, 1, 0, 0, 0, 1],
-           [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
-           [1, 0, 1, 0, 0, 0, 1, 0, 0, 1],
-           [1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
-           [1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
-           [1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
-           [1, 1, 1, 1, 1, 1, 1, 1, 1, 1] ]
-
-entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 2, 0, 0],
-             [0, 0, 3, 0, 0, 0, 0, 3, 0, 0],
-             [0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 1, 4, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 4, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] ]"""
-#entities = [ [0, 0, 0, 0, 0, 0, 0],
-#             [0, 0, 0, 0, 4, 1, 0],
-#             [0, 0, 0, 0, 0, 1, 0],
-#             [0, 0, 0, 0, 0, 0, 0],
-#             [0, 1, 0, 0, 0, 0, 0],
-#             [0, 0, 0, 0, 0, 0, 0] ]
-"""
-solids = [[1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 2, 0, 1],
-            [1, 0, 9, 4, 4, 5, 1],
-            [1, 0, 8, 7, 8, 5, 1],
-            [1, 0, 0, 8, 4, 6, 1],
-            [1, 0, 0, 1, 2, 0, 3],
-            [1, 1, 1, 1, 1, 1, 1]]
-
-entities = [[0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 3, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0]]
-"""
-"""
-111111
-100201
-194401
-151001
-101001
-101203
-111111
-
-000000
-000000
-000300
-000100
-...
-"""
-
-#character_pos = (2, 5)
 
 # Values meaning:
 
@@ -103,7 +27,6 @@ entities = [[0, 0, 0, 0, 0, 0, 0],
 # 3: minecart
 # 4: spider
 
-#character_pos = (7, 6)
 
 class Game(Viewer):
     def __init__(self, solids, entities, character_pos):
@@ -131,7 +54,7 @@ class Game(Viewer):
         """ Main render loop for this OpenGL window """
         while not glfw.window_should_close(self.win):
             if not self.waiting:
-                if self.iterator < 3:#0:
+                if self.iterator < 25:
                     self.iterator += 1
                 else:
                     self.iterator = 0
@@ -240,8 +163,6 @@ class Game(Viewer):
 
 
 
-
-
     def spiders_moving(self, player_movement):
         player_connexe = self.get_player_connexe()
         for spider in self.spiders:
@@ -268,7 +189,7 @@ class Game(Viewer):
                         spider.move(movement)
                         return
                 #the spider can't go anywhere, this poor creature is crushed:'(
-                spiders.remove(spider)
+                self.spiders.remove(spider)
                 spider.die()
 
     def get_player_connexe(self):
@@ -357,41 +278,6 @@ class Game(Viewer):
                 self.change_board((0, 1))
                 #glfw.set_time(0.0)
 
-
-    """ def print_board():
-        print("")
-        for i in range(len(self.solids)):
-            line = ""
-            for j in range(len(self.solids[0])):
-                if (i,j) == player.pos:
-                    line += "☺ "
-                elif entity_on((i,j)) == 0:
-                    if self.solids[i][j] == 0:
-                        line += "  "
-                    elif solids[i][j] == 1:
-                        line += "▓▓"
-                    elif solids[i][j] == 3:
-                        line += "══"
-                    elif solids[i][j] == 4:
-                        line += "║ "
-                    elif solids[i][j] == 5:
-                        line += "╝ "
-                    elif solids[i][j] == 6:
-                        line += "╗ "
-                    elif solids[i][j] == 7:
-                        line += "╚═"
-                    elif solids[i][j] == 8:
-                        line += "╔═"
-                elif isinstance(entity_on((i,j)), Ore):
-                    line += "▲ "
-                elif isinstance(entity_on((i,j)), Barrel):
-                    line += "o "
-                elif isinstance(entity_on((i,j)), Minecart):
-                    line += "◙ "
-                elif isinstance(entity_on((i,j)), Spider):
-                    line += "x "
-            print(line) """
-
     def create_all_entities(self):
         for i in range(len(self.entities)):
             for j in range(len(self.entities[0])):
@@ -400,8 +286,8 @@ class Game(Viewer):
                     if entity == 1:
                         self.change_entity((i,j), Ore((i,j)))
                         self.ores += 1
-                    #if entity == 2:
-                    #    self.change_entity((i,j), Barrel((i,j)))
+                    if entity == 2:
+                        self.change_entity((i,j), Barrel((i,j)))
                     if entity == 3:
                         self.change_entity((i,j), Minecart((i,j), rail=self.solid_on((i,j))))
                     if entity == 4:
@@ -421,6 +307,7 @@ def main(path):
         character_pos = (door_location[0], door_location[1] - 1)
     else:
         character_pos = (door_location[0] - 1, door_location[1])
+    print(character_pos)
     
     game = Game(solids, entities, character_pos)
     game.run()
@@ -431,22 +318,3 @@ if __name__ == '__main__':
         print("Please enter a .txt game level")
         sys.exit()
     main(sys.argv[1])
-    # create_all_entities()
-    # while(player.alive):
-    #     print_board()
-    #     while(True):
-    #         move_char = input()
-    #         if move_char == 'z':
-    #             movement = (-1, 0)
-    #             break
-    #         if move_char == 'q':
-    #             movement = (0, -1)
-    #             break
-    #         if move_char == 's':
-    #             movement = (1, 0)
-    #             break
-    #         if move_char == 'd':
-    #             movement = (0, 1)
-    #             break
-    #     change_board(movement)
-    #print_board()

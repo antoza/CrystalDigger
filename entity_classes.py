@@ -37,9 +37,9 @@ class Creature(Node):
         self.iterator = 0
         self.movement = (0, 0)
         self.angle = 0
-        self.max_walk = 1#10
-        self.max_rotate = 1#10
-        self.max_attack = 1#15
+        self.max_walk = 10
+        self.max_rotate = 10
+        self.max_attack = 15
 
     def draw(self, model=identity(), **other_uniforms):
         if self.iterator == 0:
@@ -66,8 +66,6 @@ class Creature(Node):
 
     def rotate_iterator(self):
         max_rotate = self.max_rotate
-        if self.angle == 180:
-            max_rotate = 2 * max_rotate
 
         if self.iterator < max_rotate:
             self.old_transform = self.old_transform @ rotate(axis=(0., 0., 1.), angle=self.angle / max_rotate)
@@ -157,22 +155,68 @@ class Ore(Node):
         super().__init__(transform=translate(pos[1]+.5, -pos[0]-.5, 0) @ transform @ self.base_transform)
         self.states = [IDLE]
         self.add(*load(file="src/crystal/Crystals.obj", tex_file="src/crystal/Tex1.png", shader=shader, light_dir=(0,0,1)))
+        self.destroyed = False
+        self.max_wait = 10
+        self.iterator = 0
 
     def destroy(self):
-        self.display(False)
+        self.destroyed = True
 
+    def draw(self, model, **other_uniforms):
+        if self.destroyed:
+            self.iterator += 1
+        if self.iterator == self.max_wait:
+            self.display(False)
+        super().draw(model=model, **other_uniforms)
 
 class Barrel(Node):
     def __init__(self, pos):
-        super().__init__()
+        super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, .2) @ rotate((0, 0, 1), 90))
         self.pos = pos
-        self.etat = IDLE
+        self.old_pos = pos
+        self.states = [IDLE]
+
+        self.iterator = 0
+        self.movement = (0, 0)
+
+        self.max_walk = 10
+        self.max_wait = 10
+    
+        shader = Shader("shaders/texture.vert", "shaders/texture.frag")
+        self.add(*load(file="src/cube/cube.obj", tex_file="src/cube/cube.png", shader=shader, light_dir=(0,0,1)))
 
     def move(self, movement):
+        self.old_pos = self.pos
         self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
-        # self.etat = (MOVE, movement)
-        while self.etat != IDLE:
-            pass
+        self.movement = movement
+        self.update_state(WALK)
+
+    def draw(self, model=identity(), **other_uniforms):
+        if self.iterator == 0:
+            glfw.set_time(0.0)
+        if self.states[-1] == WALK:
+            self.walk_iterator()
+
+        super().draw(model=model, **other_uniforms)
+
+    def walk_iterator(self):
+        if self.iterator < self.max_wait:
+            self.iterator += 1
+            return
+        if self.iterator < self.max_wait + self.max_walk:
+            self.transform = translate(self.movement[1] / self.max_walk, -self.movement[0] / self.max_walk,
+                                           0) @ self.transform
+            self.iterator += 1
+            return
+
+        self.update_state()
+        self.iterator = 0
+
+    def update_state(self, new_state=None):
+        if new_state is None:
+            self.states.pop()
+        else:
+            self.states.append(new_state)
 
 
 class Minecart(Node):
@@ -180,7 +224,6 @@ class Minecart(Node):
         super().__init__(transform=translate(pos[1], -pos[0]+rail-5, .2) @ rotate((0, 0, 1), 90*(4-rail)))
         self.pos = pos
         self.old_pos = pos
-        self.init_angle(rail)
         self.states = [IDLE]
 
         self.iterator = 0
@@ -188,8 +231,9 @@ class Minecart(Node):
         self.angle = []
         self.rotation_center = []
 
-        self.max_walk = 1#5
-        self.max_rotate = 1#5
+        self.max_wait = 10
+        self.max_walk = 5
+        self.max_rotate = 5
     
         shader = Shader("shaders/texture.vert", "shaders/texture.frag")
         self.add(MinecartObj(shader))
@@ -242,7 +286,10 @@ class Minecart(Node):
         super().draw(model=model, **other_uniforms)
 
     def walk_iterator(self):
-        if self.iterator < self.max_walk:
+        if self.iterator < self.max_wait * (len(self.states)-2):
+            self.iterator += 1
+            return
+        if self.iterator < self.max_wait * (len(self.states)-2) + self.max_walk:
             self.transform = translate(self.movement[1] / self.max_walk / 2, -self.movement[0] / self.max_walk / 2,
                                            0) @ self.transform
             self.iterator += 1
@@ -252,7 +299,10 @@ class Minecart(Node):
         self.iterator = 0
 
     def rotate_iterator(self):
-        if self.iterator < self.max_rotate:
+        if self.iterator < self.max_wait * (len(self.states)-2):
+            self.iterator += 1
+            return
+        if self.iterator < self.max_wait * (len(self.states)-2) + self.max_rotate:
             angle = self.angle[-1]
             rotation_center = self.rotation_center[-1]
             self.transform = translate(rotation_center[1], -rotation_center[0], 0) @ rotate(axis=(0., 0., 1.), angle=angle / self.max_rotate) @ translate(-rotation_center[1], rotation_center[0], 0) @ self.transform 
@@ -269,19 +319,6 @@ class Minecart(Node):
             self.states.pop()
         else:
             self.states.append(new_state)
-
-    def init_angle(self, rail):
-        if rail == 4:
-            return
-        elif rail == 5:
-            return
-            # rotate de 90°
-        elif rail in (6, 7):
-            self.linear_roll((-1, 0))
-            self.rotative_roll((1, 0), rail)
-        else:
-            self.linear_roll((1, 0))
-            self.rotative_roll((-1, 0), rail)
 
 
 

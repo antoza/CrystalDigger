@@ -59,7 +59,7 @@ def load_from_txt(path):
             # Verify walls in first and second column
             if first_part and (matrix_line[0] != '1' or matrix_line[-1] != '1'):
                 # Verify unicity of door
-                if matrix_line[-1] == '3':
+                if (matrix_line[0], matrix_line[-1]) in (('3', '1'), ('1', '3')):
                     if door:
                         clode_file(file, "only one door please")
                     door = True
