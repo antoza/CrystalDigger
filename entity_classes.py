@@ -178,7 +178,7 @@ class Ore(Node):
 
 class Barrel(Node):
     def __init__(self, pos, fps=5):
-        super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, .2) @ rotate((0, 0, 1), 90))
+        super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, .5) @ rotate((0, 0, 1), 90) @ scale(.8, .8, .8))
         self.pos = pos
         self.old_pos = pos
         self.states = [IDLE]
@@ -229,7 +229,7 @@ class Barrel(Node):
 
 class Minecart(Node):
     def __init__(self, pos, rail=4, fps=5):
-        super().__init__(transform=translate(pos[1], -pos[0]+rail-5, .7) @ rotate((0, 0, 1), 90*(4-rail)))
+        super().__init__(transform=translate(pos[1], -pos[0]+rail-5, .2) @ rotate((0, 0, 1), 90*(4-rail)))
         self.pos = pos
         self.old_pos = pos
         self.states = [IDLE]

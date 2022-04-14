@@ -305,7 +305,7 @@ class Game(Viewer):
 
 
 def main(path, fps):
-    solids, entities, door_location = load_from_txt("GameLevels/"+path)
+    solids, entities, door_location = load_from_txt("GameLevels/"+path+".txt")
     if door_location[0] == 0:
         first_move = (1, 0)
     elif door_location[1] == 0:

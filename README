@@ -1,0 +1,51 @@
+Bienvenue sur Crystal Digger, le nouveau jeu de stratégie !
+
+
+- LANCEMENT :
+
+Pour jouer, lancer simplement la commande suivante :
+./game.py Level_X Y
+Avec :
+	X le niveau (entre 1 et 4)
+	Y un nombre permettant d'avoir une meilleure qualité d'animation au prix des performances. Si vous ne rentrez pas de Y, par défaut il sera égal à 5. (Si vous avez d'importants problèmes de performance, choisissez Y=1)
+
+
+- BUT DU JEU :
+
+Votre personnage entre par la porte principale. Pour gagner la partie, vous devez miner tous les cristaux et vous enfuir de la mine par la porte principale.
+Vous pouvez pousser les caisses et les chariots pour vous frayer un passage, ou encore bloquer le passage des araignées.
+Attention, les araignées vous pourchassent pour vous tuer ! En revanche, elle ne bougeront que si il existe un chemin vers vous.
+Les derniers niveaux sont assez difficiles, bonne chance pour les résoudre :)
+
+
+- COMMANDES :
+
+Pour vous déplacer, appuyez sur les flèches directionnelles de votre clavier.
+Pour miner un crystal, ou pousser un objet, il suffit de vous diriger vers eux.
+
+
+
+- BONUS :
+Vous pouvez créer votre propre niveau dans GameLevels en renseignant deux tableaux (vous pouvez regarder comment sont créés les autres niveaux pour les imiter).
+
+Voici la liste des id :
+Premier tableau :
+0: void
+1: wall
+2: torch
+3: door
+4: rails ═
+5: rails ║
+6: rails ╝
+7: rails ╗
+8: rails ╚
+9: rails ╔
+
+Deuxième tableau :
+0: nothing
+1: gold ore
+2: barrel
+3: minecart
+
+La porte doit être sur les extrémités, les minecarts doivent être sur des rails, et rien ne doit se trouver devant la porte d'entrer à l'exception des torches et des rails.
+# 4: spider
