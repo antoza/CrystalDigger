@@ -65,13 +65,13 @@ void main() {
         vec3 r = reflect(-l, n);
 
         vec3 light_color = hermite_spline(d_sq);
-        vec3 diffuse_color = k_d * light_color * max(0, dot(n, l));
+        vec3 diffuse_color = 2*k_d * light_color * max(0, dot(n, l));
         vec3 specular_color = k_s * light_color * pow(max(0, dot(r, v)), s);
         phong += vec4((diffuse_color + specular_color) / d_sq, 1);
-        phong += vec4(0.02 * light_color, 1);
+        phong += vec4(0.03 * light_color, 1);
     }
 
     vec4 color = texture(diffuse_map, frag_tex_coords);
 
-    out_color = phong * color;
+    out_color = color * phong;
 }
