@@ -12,6 +12,7 @@ IDLE = 0
 WALK = 1
 ROTATE = 2
 ATTACK = 3
+DIE = 4
 
 
 class Creature(Node):
@@ -41,6 +42,7 @@ class Creature(Node):
         self.max_walk = 2*fps
         self.max_rotate = 2*fps
         self.max_attack = 3*fps
+        self.max_die = 3*fps
 
     def draw(self, model=identity(), **other_uniforms):
         if self.iterator == 0:
@@ -51,6 +53,8 @@ class Creature(Node):
             self.rotate_iterator()
         elif self.states[-1] == ATTACK:
             self.attack_iterator()
+        elif self.states[-1] == DIE:
+            self.die_iterator()
 
         super().draw(model=model, **other_uniforms)
 
@@ -85,6 +89,12 @@ class Creature(Node):
         self.update_state()
         self.iterator = 0
 
+    def die_iterator(self):
+        if self.iterator < self.max_die:
+            self.iterator += 1
+            return
+        self.display(False)
+
     def update_state(self, new_state=None):
         self.children[self.listState[self.states[-1]]].display(False)
         if new_state is None:
@@ -99,6 +109,11 @@ class Creature(Node):
 
     def attack(self):
         self.update_state(ATTACK)
+
+    def die(self):
+        print("je me meurt")
+        self.states = [IDLE]
+        self.update_state(DIE)
 
     def walk(self, movement):
         self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
@@ -123,9 +138,9 @@ class Creature(Node):
 class Player(Creature):
     def __init__(self, pos=(0, 0), transform=identity(), fps=5):
         shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
-        ways = ["src/Knight/Knight_Idle.fbx", "src/Knight/Knight_run.fbx", "src/Knight/Knight_attack_2.fbx"]
+        ways = ["src/Knight/Knight_Idle.fbx", "src/Knight/Knight_run.fbx", "src/Knight/Knight_attack_2.fbx", "src/Knight/Knight_death.fbx"]
         transform_knight = rotate(axis=(1., 0., 0.), angle=90) @ scale(0.003, 0.002, 0.003)
-        listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
+        listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2, DIE: 3}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_knight,
                          listState=listState, fps=fps)
 
@@ -136,20 +151,15 @@ class Player(Creature):
     def push(self, movement):
         self.move(movement)
 
-    def die(self):
-        ...
-
 
 class Spider(Creature):
     def __init__(self, pos=(0, 0), transform=identity(), fps=5):
         shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
-        ways = ["src/Spider/Spider_Idle.fbx", "src/Spider/Spider_run.fbx", "src/Spider/Spider_attack_1.fbx"]
+        ways = ["src/Spider/Spider_Idle.fbx", "src/Spider/Spider_run.fbx", "src/Spider/Spider_attack_1.fbx", "src/Spider/Spider_death.fbx"]
         transform_spider = rotate(axis=(1., 0., 0.), angle=90) @ scale(0.008, 0.008, 0.008)
-        listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
+        listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2, DIE: 3}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_spider,
                          listState=listState, fps=fps)
-    def die(self):
-        self.display = False
 
 
 

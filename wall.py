@@ -57,13 +57,13 @@ class Door(Node):
 
         super().__init__((door_frame, self.door_leaf), transform=transform@rotate((1, 0, 0), 90)@translate(.2, 0, 0))
 
-    def key_handler(self, key):
-        if key == glfw.KEY_O:
-            if not self.opened:
-                self.target_angle = 90
-        if key == glfw.KEY_C:
-            if self.opened:
-                self.target_angle = -90
+    def open(self):
+        if not self.opened:
+            self.target_angle = 90
+    
+    def close(self):
+        if self.opened:
+            self.target_angle = -90
 
     def draw(self, model=identity(), **other_uniforms):
         if self.angle != self.target_angle:

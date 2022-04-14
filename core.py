@@ -408,28 +408,26 @@ class Viewer(Node):
             if key == glfw.KEY_SPACE:
                 glfw.set_time(0.0)
 
-        if action == glfw.PRESS:
-            old = self.mouse
-            if key == glfw.KEY_W:
-                #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
-                #self.trackball.drag(old, (old[0], old[1] +10), glfw.get_window_size(_win)[1])
-                self.trackball.drag((0, 0), (-10, 10), glfw.get_window_size(self.win)[1])
-            if key == glfw.KEY_S:
-                #self.trackball.drag((700, 500), (700, 500+200), glfw.get_window_size(_win)[1])
-                self.trackball.pan((0, 0), (0, 10))
-                #self.trackball.zoom(1, glfw.get_window_size(_win)[1])
+        # if action == glfw.PRESS:
+        #     old = self.mouse
+        #     if key == glfw.KEY_W:
+        #         #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
+        #         #self.trackball.drag(old, (old[0], old[1] +10), glfw.get_window_size(_win)[1])
+        #         self.trackball.drag((0, 0), (-10, 10), glfw.get_window_size(self.win)[1])
+        #     if key == glfw.KEY_S:
+        #         #self.trackball.drag((700, 500), (700, 500+200), glfw.get_window_size(_win)[1])
+        #         self.trackball.pan((0, 0), (0, 10))
+        #         #self.trackball.zoom(1, glfw.get_window_size(_win)[1])
 
         if action == glfw.PRESS:
             old = self.mouse
             pas = 50
             if key == glfw.KEY_W:
-                ...
-                #self.mouse = (old[0], old[1] - pas)
+                self.mouse = (old[0], old[1] - pas)
             if key == glfw.KEY_A:
                 self.mouse = (old[0] + pas, old[1])
             if key == glfw.KEY_S:
-                ...
-                #self.mouse = (old[0], old[1] + pas)
+                self.mouse = (old[0], old[1] + pas)
             if key == glfw.KEY_D:
                 self.mouse = (old[0] - pas, old[1])
             self.trackball.pan(old, self.mouse)

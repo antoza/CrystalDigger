@@ -241,13 +241,18 @@ class Scene(Node):
         shader_rails = Shader("shaders/texture.vert", "shaders/texture.frag")
         rails = generate_rails(shader_rails, level)
 
-        super().__init__((floor, walls, doors, torches, rails), transform=transform)
+        super().__init__((doors, floor, walls, torches, rails), transform=transform)
 
     def draw(self, model=identity(), **other_uniforms):
         super().draw(model=model, lights=self.lights_pos, nb_lights=self.lights_pos.shape,
                      light_colors=self.light_colors, nb_colors=self.light_colors.shape[0],
                      catmull=self.catmull, d_segt=1, **other_uniforms)
 
+    def open_door(self):
+        self.children[0].children[0].children[0].open()
+
+    def close_door(self):
+        self.children[0].children[0].children[0].close()
 
 def main():
     viewer = Viewer()

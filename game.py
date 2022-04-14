@@ -45,6 +45,7 @@ class Game(Viewer):
         self.entities = entities
         self.player = Player(door_location, fps=fps)
         self.player.move(first_move)
+        self.scene.open_door()
         self.scene.add(self.player)
         self.ores = 0
         self.spiders = []
@@ -60,6 +61,10 @@ class Game(Viewer):
     def run(self):
         """ Main render loop for this OpenGL window """
         while not glfw.window_should_close(self.win):
+            if self.ores != 0:
+                self.scene.close_door()
+            else:
+                self.scene.open_door()
             if not self.waiting:
                 if self.iterator < 5*self.fps:
                     self.iterator += 1
@@ -197,6 +202,7 @@ class Game(Viewer):
                         return
                 #the spider can't go anywhere, this poor creature is crushed:'(
                 self.spiders.remove(spider)
+                print(spider)
                 spider.die()
 
     def get_player_connexe(self):
