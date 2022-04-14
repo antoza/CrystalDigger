@@ -30,7 +30,10 @@ from core import *
 
 class Game(Viewer):
     def __init__(self, solids, entities, character_pos):
-        super().__init__(width=100*len(solids[0]), height=100*len(solids))
+        width = 100*len(solids[0])
+        height = 100*len(solids)
+        size = max(width, height)
+        super().__init__(width=size, height=size)
         self.temporary_shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
         self.solids = solids
         self.shader = Shader("shaders/texture.vert", "shaders/scene.frag")
@@ -48,7 +51,9 @@ class Game(Viewer):
         self.waiting = True
         self.iterator = 0
         self.game_over = False
-        self.trackball.zoom(-30, glfw.get_window_size(self.win)[1])
+
+        self.trackball.zoom(-max(height, width)**2/15000, size)
+        self.trackball.drag((size//2, size//2), (size//2,  size//2  + 50), size)
 
     def run(self):
         """ Main render loop for this OpenGL window """
@@ -303,11 +308,10 @@ def main(path):
         character_pos = (door_location[0] + 1, door_location[1])
     elif door_location[1] == 0:
         character_pos = (door_location[0], door_location[1] + 1)
-    elif door_location[1] == len(solids) - 1:
-        character_pos = (door_location[0], door_location[1] - 1)
-    else:
+    elif door_location[0] == len(solids) - 1:
         character_pos = (door_location[0] - 1, door_location[1])
-    print(character_pos)
+    else:
+        character_pos = (door_location[0], door_location[1] - 1)
 
     game = Game(solids, entities, character_pos)
     game.run()

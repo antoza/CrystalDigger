@@ -135,6 +135,9 @@ class Player(Creature):
     def push(self, movement):
         self.move(movement)
 
+    def die(self):
+        ...
+
 
 class Spider(Creature):
     def __init__(self, pos=(0, 0), transform=identity()):
@@ -182,8 +185,8 @@ class Barrel(Node):
         self.max_walk = 10
         self.max_wait = 10
 
-        shader = Shader("shaders/texture.vert", "shaders/texture.frag")
-        self.add(*load(file="src/cube/cube.obj", tex_file="src/cube/cube.png", shader=shader, light_dir=(0,0,1)))
+        shader = Shader("shaders/barrel.vert", "shaders/barrel.frag")
+        self.add(*load(file="src/cube/cube.obj", tex_file="src/cube/cube.png", shader=shader))
 
     def move(self, movement):
         self.old_pos = self.pos
@@ -321,7 +324,7 @@ class Minecart(Node):
             self.states.append(new_state)
 
 
-def main():
+def test():
     """ create a window, add scene objects, then run rendering loop """
     viewer = Viewer()
     viewer.trackball.zoom(-50, glfw.get_window_size(viewer.win)[1])
@@ -347,4 +350,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    test()
