@@ -188,7 +188,7 @@ class Barrel(Node):
         self.max_walk = 2*fps
         self.max_wait = 2*fps
 
-        shader = Shader("shaders/texture.vert", "shaders/texture.frag")
+        shader = Shader("shaders/barrel.vert", "shaders/barrel.frag")
         self.add(*load(file="src/cube/cube.obj", tex_file="src/cube/cube.png", shader=shader))
 
     def move(self, movement):
