@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+import sys
+
+from load_game import load_from_txt
 from entity_classes import *
 from core import *
 
@@ -43,7 +47,7 @@ entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 0, 0, 0],
 #             [0, 1, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 0, 0, 0] ]
-
+"""
 solids = [[1, 1, 1, 1, 1, 1, 1],
             [1, 0, 0, 0, 2, 0, 1],
             [1, 0, 9, 4, 4, 5, 1],
@@ -59,7 +63,7 @@ entities = [[0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0]]
-
+"""
 """
 111111
 100201
@@ -76,7 +80,8 @@ entities = [[0, 0, 0, 0, 0, 0, 0],
 ...
 """
 
-character_pos = (2, 5)
+#character_pos = (2, 5)
+
 # Values meaning:
 
 # value: solid
@@ -202,7 +207,7 @@ class Game(Viewer):
                     return
             else:
                 if not self.solid_on(given_pos) in (4, 6, 7) or not self.solid_on(target_pos) in (4, 8, 9):
-                    return 
+                    return
 
             self.change_entity(target_pos, entity)
             self.change_entity(given_pos, 0)
@@ -406,14 +411,26 @@ class Game(Viewer):
                     self.scene.add(self.entity_on((i,j)))
 
 
-def main():
+def main(path):
+    solids, entities, door_location = load_from_txt(path)
+    if door_location[0] == 0:
+        character_pos = (door_location[0] + 1, door_location[1])
+    elif door_location[1] == 0:
+        character_pos = (door_location[0], door_location[1] + 1)
+    elif door_location[1] == len(solids) - 1:
+        character_pos = (door_location[0], door_location[1] - 1)
+    else:
+        character_pos = (door_location[0] - 1, door_location[1])
+    
     game = Game(solids, entities, character_pos)
     game.run()
 
 
 if __name__ == '__main__':
-    main()
-
+    if len(sys.argv) < 2:
+        print("Please enter a .txt game level")
+        sys.exit()
+    main(sys.argv[1])
     # create_all_entities()
     # while(player.alive):
     #     print_board()

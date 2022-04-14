@@ -84,7 +84,7 @@ def load_from_txt(path):
     door_location = (0, 0)
     for i in range(len(solids)):
         for j in range(len_line):
-            if int(solids[i][j]) < 0 or int(solids[i][j]) > 3:
+            if int(solids[i][j]) < 0 or int(solids[i][j]) > 9:
                 clode_file(file, "invalid solids")
             if solids[i][j] == '3':
                 if door_location != (0, 0):
