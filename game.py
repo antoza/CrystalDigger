@@ -101,6 +101,7 @@ class Game(Viewer):
         if entity == 0:
             self.player.move(movement)
             if self.solid_on(given_pos) == 3 and self.ores == 0:
+                print("You won !")
                 self.game_over = True
 
         elif isinstance(entity, Ore):
@@ -153,6 +154,7 @@ class Game(Viewer):
             self.player.move(movement)
             entity.attack()
             self.player.die()
+            print("You died")
             self.game_over = True
             return
 
@@ -188,6 +190,7 @@ class Game(Viewer):
                 if spider.pos == self.player.pos:
                     spider.attack()
                     self.player.die()
+                    print("You died")
                     self.game_over = True
             #the spider is pushed with a barrel or a minecart
             elif isinstance(self.entity_on(spider.pos), (Barrel, Minecart)):

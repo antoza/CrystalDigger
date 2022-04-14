@@ -111,7 +111,6 @@ class Creature(Node):
         self.update_state(ATTACK)
 
     def die(self):
-        print("je me meurt")
         self.states = [IDLE]
         self.update_state(DIE)
 
