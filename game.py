@@ -29,7 +29,7 @@ from core import *
 
 
 class Game(Viewer):
-    def __init__(self, solids, entities, character_pos):
+    def __init__(self, solids, entities, door_location, character_pos, fps):
         super().__init__(width=100*len(solids[0]), height=100*len(solids))
         self.temporary_shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
         self.solids = solids
@@ -40,12 +40,14 @@ class Game(Viewer):
         self.add(self.scene)
 
         self.entities = entities
-        self.player = Player(character_pos)
+        self.player = Player(door_location, fps=fps)
+        self.player.move()
         self.scene.add(self.player)
         self.ores = 0
         self.spiders = []
-        self.create_all_entities()
+        self.create_all_entities(fps)
         self.waiting = True
+        self.fps = fps
         self.iterator = 0
         self.game_over = False
         self.trackball.zoom(-30, glfw.get_window_size(self.win)[1])
@@ -54,7 +56,7 @@ class Game(Viewer):
         """ Main render loop for this OpenGL window """
         while not glfw.window_should_close(self.win):
             if not self.waiting:
-                if self.iterator < 25:
+                if self.iterator < 5*self.fps:
                     self.iterator += 1
                 else:
                     self.iterator = 0
@@ -278,26 +280,26 @@ class Game(Viewer):
                 self.change_board((0, 1))
                 #glfw.set_time(0.0)
 
-    def create_all_entities(self):
+    def create_all_entities(self, fps):
         for i in range(len(self.entities)):
             for j in range(len(self.entities[0])):
                 entity = self.entity_on((i,j))
                 if entity != 0:
                     if entity == 1:
-                        self.change_entity((i,j), Ore((i,j)))
+                        self.change_entity((i,j), Ore((i,j), fps=fps))
                         self.ores += 1
                     if entity == 2:
-                        self.change_entity((i,j), Barrel((i,j)))
+                        self.change_entity((i,j), Barrel((i,j), fps=fps))
                     if entity == 3:
-                        self.change_entity((i,j), Minecart((i,j), rail=self.solid_on((i,j))))
+                        self.change_entity((i,j), Minecart((i,j), rail=self.solid_on((i,j)), fps=fps))
                     if entity == 4:
-                        spider = Spider((i,j))
+                        spider = Spider((i,j), fps=fps)
                         self.spiders.append(spider)
                         self.change_entity((i,j), spider)
                     self.scene.add(self.entity_on((i,j)))
 
 
-def main(path):
+def main(path, fps):
     solids, entities, door_location = load_from_txt(path)
     if door_location[0] == 0:
         character_pos = (door_location[0] + 1, door_location[1])
@@ -307,9 +309,8 @@ def main(path):
         character_pos = (door_location[0], door_location[1] - 1)
     else:
         character_pos = (door_location[0] - 1, door_location[1])
-    print(character_pos)
 
-    game = Game(solids, entities, character_pos)
+    game = Game(solids, entities, door_location, character_pos, fps)
     game.run()
 
 
@@ -317,4 +318,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Please enter a .txt game level")
         sys.exit()
-    main(sys.argv[1])
+    fps = 5
+    if len(sys.argv) == 3:
+        fps = int(sys.argv[2])
+    main(sys.argv[1], fps)

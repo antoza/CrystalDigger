@@ -15,7 +15,7 @@ ATTACK = 3
 
 
 class Creature(Node):
-    def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(),
+    def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(), fps=5,
                  base_transform=identity(), orientation=(1, 0), listState={}):
         super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, .1)
                          @ transform @ base_transform)
@@ -37,9 +37,10 @@ class Creature(Node):
         self.iterator = 0
         self.movement = (0, 0)
         self.angle = 0
-        self.max_walk = 10
-        self.max_rotate = 10
-        self.max_attack = 15
+        self.fps = fps
+        self.max_walk = 2*fps
+        self.max_rotate = 2*fps
+        self.max_attack = 3*fps
 
     def draw(self, model=identity(), **other_uniforms):
         if self.iterator == 0:
@@ -120,13 +121,13 @@ class Creature(Node):
 
 
 class Player(Creature):
-    def __init__(self, pos=(0, 0), transform=identity()):
+    def __init__(self, pos=(0, 0), transform=identity(), fps=5):
         shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
         ways = ["src/Knight/Knight_Idle.fbx", "src/Knight/Knight_run.fbx", "src/Knight/Knight_attack_2.fbx"]
         transform_knight = rotate(axis=(1., 0., 0.), angle=90) @ scale(0.003, 0.002, 0.003)
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_knight,
-                         listState=listState)
+                         listState=listState, fps=fps)
 
     def mine(self, movement):
         self.attack()
@@ -137,18 +138,18 @@ class Player(Creature):
 
 
 class Spider(Creature):
-    def __init__(self, pos=(0, 0), transform=identity()):
+    def __init__(self, pos=(0, 0), transform=identity(), fps=5):
         shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
         ways = ["src/Spider/Spider_Idle.fbx", "src/Spider/Spider_run.fbx", "src/Spider/Spider_attack_1.fbx"]
         transform_spider = rotate(axis=(1., 0., 0.), angle=90) @ scale(0.008, 0.008, 0.008)
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_spider,
-                         listState=listState)
+                         listState=listState, fps=fps)
 
 
 
 class Ore(Node):
-    def __init__(self, pos=(0, 0), transform=identity()):
+    def __init__(self, pos=(0, 0), transform=identity(), fps=5):
         shader = Shader("shaders/textured.vert", "shaders/textured.frag")
         self.base_transform = translate(0, 0, .5) @ rotate((1,0,0),90) @ scale(.1, .1, .1)
         self.pos = pos
@@ -156,7 +157,8 @@ class Ore(Node):
         self.states = [IDLE]
         self.add(*load(file="src/crystal/Crystals.obj", tex_file="src/crystal/Tex1.png", shader=shader, light_dir=(0,0,1)))
         self.destroyed = False
-        self.max_wait = 10
+        self.fps = fps
+        self.max_wait = 2*fps
         self.iterator = 0
 
     def destroy(self):
@@ -170,7 +172,7 @@ class Ore(Node):
         super().draw(model=model, **other_uniforms)
 
 class Barrel(Node):
-    def __init__(self, pos):
+    def __init__(self, pos, fps=5):
         super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, .2) @ rotate((0, 0, 1), 90))
         self.pos = pos
         self.old_pos = pos
@@ -179,8 +181,9 @@ class Barrel(Node):
         self.iterator = 0
         self.movement = (0, 0)
 
-        self.max_walk = 10
-        self.max_wait = 10
+        self.fps = fps
+        self.max_walk = 2*fps
+        self.max_wait = 2*fps
 
         shader = Shader("shaders/texture.vert", "shaders/texture.frag")
         self.add(*load(file="src/cube/cube.obj", tex_file="src/cube/cube.png", shader=shader, light_dir=(0,0,1)))
@@ -220,8 +223,8 @@ class Barrel(Node):
 
 
 class Minecart(Node):
-    def __init__(self, pos, rail=4):
-        super().__init__(transform=translate(pos[1], -pos[0]+rail-5, .2) @ rotate((0, 0, 1), 90*(4-rail)))
+    def __init__(self, pos, rail=4, fps=5):
+        super().__init__(transform=translate(pos[1], -pos[0]+rail-5, .7) @ rotate((0, 0, 1), 90*(4-rail)))
         self.pos = pos
         self.old_pos = pos
         self.states = [IDLE]
@@ -231,9 +234,10 @@ class Minecart(Node):
         self.angle = []
         self.rotation_center = []
 
-        self.max_wait = 10
-        self.max_walk = 5
-        self.max_rotate = 5
+        self.fps = fps
+        self.max_wait = 2*fps
+        self.max_walk = fps
+        self.max_rotate = fps
 
         shader = Shader("shaders/texture.vert", "shaders/texture.frag")
         self.add(MinecartObj(shader))
