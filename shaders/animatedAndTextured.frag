@@ -68,7 +68,7 @@ void main() {
         vec3 diffuse_color = k_d * light_color * max(0, dot(n, l));
         vec3 specular_color = k_s * light_color * pow(max(0, dot(r, v)), s);
         phong += vec4((diffuse_color + specular_color) / d_sq, 1);
-        phong += vec4(0.07 * light_color, 1);
+        phong += vec4(0.01 * light_color, 1);
     }
 
     vec4 color = texture(diffuse_map, frag_tex_coords);

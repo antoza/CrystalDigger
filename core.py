@@ -330,8 +330,8 @@ def load(file, shader, tex_file=None, **params):
             node_to_populate.add(new_mesh)
 
     nb_triangles = sum((mesh.mNumFaces for mesh in scene.mMeshes))
-    print('Loaded', file, '\t(%d meshes, %d faces, %d nodes, %d animations)' %
-          (scene.mNumMeshes, nb_triangles, len(nodes), scene.mNumAnimations))
+    #print('Loaded', file, '\t(%d meshes, %d faces, %d nodes, %d animations)' %
+    #      (scene.mNumMeshes, nb_triangles, len(nodes), scene.mNumAnimations))
     return [root_node]
 
 
@@ -364,9 +364,9 @@ class Viewer(Node):
         glfw.set_window_size_callback(self.win, self.on_size)
 
         # useful message to check OpenGL renderer characteristics
-        print('OpenGL', GL.glGetString(GL.GL_VERSION).decode() + ', GLSL',
-              GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION).decode() +
-              ', Renderer', GL.glGetString(GL.GL_RENDERER).decode())
+        # print('OpenGL', GL.glGetString(GL.GL_VERSION).decode() + ', GLSL',
+        #       GL.glGetString(GL.GL_SHADING_LANGUAGE_VERSION).decode() +
+        #       ', Renderer', GL.glGetString(GL.GL_RENDERER).decode())
 
         # initialize GL by setting viewport and default render characteristics
         GL.glClearColor(0.1, 0.1, 0.1, 0.1)
@@ -408,23 +408,28 @@ class Viewer(Node):
             if key == glfw.KEY_SPACE:
                 glfw.set_time(0.0)
 
-        # if action == glfw.PRESS:
-        #     old = self.mouse
-        #     if key == glfw.KEY_W:
-        #         self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
-        #     if key == glfw.KEY_S:
-        #         #self.trackball.drag(old, (old[0] + 1, old[1] +10 ), glfw.get_window_size(_win)[1])
-        #         self.trackball.zoom(1, glfw.get_window_size(_win)[1])
+        if action == glfw.PRESS:
+            old = self.mouse
+            if key == glfw.KEY_W:
+                #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
+                #self.trackball.drag(old, (old[0], old[1] +10), glfw.get_window_size(_win)[1])
+                self.trackball.drag((0, 0), (-10, 10), glfw.get_window_size(self.win)[1])
+            if key == glfw.KEY_S:
+                #self.trackball.drag((700, 500), (700, 500+200), glfw.get_window_size(_win)[1])
+                self.trackball.pan((0, 0), (0, 10))
+                #self.trackball.zoom(1, glfw.get_window_size(_win)[1])
 
         if action == glfw.PRESS:
             old = self.mouse
             pas = 50
             if key == glfw.KEY_W:
-                self.mouse = (old[0], old[1] - pas)
+                ...
+                #self.mouse = (old[0], old[1] - pas)
             if key == glfw.KEY_A:
                 self.mouse = (old[0] + pas, old[1])
             if key == glfw.KEY_S:
-                self.mouse = (old[0], old[1] + pas)
+                ...
+                #self.mouse = (old[0], old[1] + pas)
             if key == glfw.KEY_D:
                 self.mouse = (old[0] - pas, old[1])
             self.trackball.pan(old, self.mouse)

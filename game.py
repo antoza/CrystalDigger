@@ -29,8 +29,12 @@ from core import *
 
 
 class Game(Viewer):
-    def __init__(self, solids, entities, door_location, character_pos, fps):
+    def __init__(self, solids, entities, door_location, first_move, fps):
         super().__init__(width=100*len(solids[0]), height=100*len(solids))
+        width = 100*len(solids[0])
+        height = 100*len(solids)
+        size = max(width, height)
+        super().__init__(width=size, height=size)
         self.temporary_shader = Shader("shaders/animatedAndTextured.vert", "shaders/animatedAndTextured.frag")
         self.solids = solids
         self.shader = Shader("shaders/texture.vert", "shaders/scene.frag")
@@ -41,7 +45,7 @@ class Game(Viewer):
 
         self.entities = entities
         self.player = Player(door_location, fps=fps)
-        self.player.move()
+        self.player.move(first_move)
         self.scene.add(self.player)
         self.ores = 0
         self.spiders = []
@@ -50,7 +54,9 @@ class Game(Viewer):
         self.fps = fps
         self.iterator = 0
         self.game_over = False
-        self.trackball.zoom(-30, glfw.get_window_size(self.win)[1])
+
+        self.trackball.zoom(-max(height, width)**2/15000, size)
+        self.trackball.drag((size//2, size//2), (size//2,  size//2  + 50), size)
 
     def run(self):
         """ Main render loop for this OpenGL window """
@@ -302,15 +308,15 @@ class Game(Viewer):
 def main(path, fps):
     solids, entities, door_location = load_from_txt(path)
     if door_location[0] == 0:
-        character_pos = (door_location[0] + 1, door_location[1])
+        first_move = (1, 0)
     elif door_location[1] == 0:
-        character_pos = (door_location[0], door_location[1] + 1)
-    elif door_location[1] == len(solids) - 1:
-        character_pos = (door_location[0], door_location[1] - 1)
+        first_move = (0, 1)
+    elif door_location[0] == len(solids) - 1:
+        first_move = (-1, 0)
     else:
-        character_pos = (door_location[0] - 1, door_location[1])
+        first_move = (0, -1)
 
-    game = Game(solids, entities, door_location, character_pos, fps)
+    game = Game(solids, entities, door_location, first_move, fps)
     game.run()
 
 
