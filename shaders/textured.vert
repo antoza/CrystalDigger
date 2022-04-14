@@ -30,12 +30,12 @@ void main() {
 
     gl_Position = projection * view * model * vec4(position, 1.0);
 
-    // fragment position in world coordinates
-    w_position = w_position4.xyz / w_position4.w;  // dehomogenize
 
     // fragment normal in world coordinates
     mat3 nit_matrix = transpose(inverse(mat3(model)));
-    w_normal = normalize(nit_matrix * normal);
+
+    w_position = (model * vec4(position, 1)).xyz;
+    w_normal = (model * vec4(normal, 0)).xyz;
 
     frag_tex_coords = tex_coord;
 }
