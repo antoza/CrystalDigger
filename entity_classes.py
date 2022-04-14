@@ -148,6 +148,8 @@ class Spider(Creature):
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_spider,
                          listState=listState, fps=fps)
+    def die(self):
+        self.display = False
 
 
 
