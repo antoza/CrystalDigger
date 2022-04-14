@@ -6,6 +6,7 @@ import numpy as np
 from core import Node, Shader, Viewer, load
 from transform import translate, rotate, scale, identity
 from scene import Scene
+from minecart import MinecartObj
 
 IDLE = 0
 WALK = 1
@@ -16,7 +17,7 @@ ATTACK = 3
 class Creature(Node):
     def __init__(self, shader, ways=[], pos=(0, 0), transform=identity(),
                  base_transform=identity(), orientation=(1, 0), listState={}):
-        super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, 0)
+        super().__init__(transform=translate(pos[1] + .5, -pos[0] - .5, .1)
                          @ transform @ base_transform)
         self.old_transform = translate(pos[1] + .5, -pos[0] - .5, 0) @ transform
         self.base_transform = base_transform
@@ -36,9 +37,9 @@ class Creature(Node):
         self.iterator = 0
         self.movement = (0, 0)
         self.angle = 0
-        self.max_walk = 10
-        self.max_rotate = 10
-        self.max_attack = 15
+        self.max_walk = 1#10
+        self.max_rotate = 1#10
+        self.max_attack = 1#15
 
     def draw(self, model=identity(), **other_uniforms):
         if self.iterator == 0:
@@ -128,17 +129,13 @@ class Player(Creature):
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_knight,
                          listState=listState)
+    
+    def mine(self, movement):
+        self.attack()
+        self.rotate(movement)
 
-    def key_handler(self, key):
-        """ Dispatch keyboard events to children with key handler """
-        if key == glfw.KEY_UP:
-            self.move((-1, 0))
-        if key == glfw.KEY_DOWN:
-            self.move((1, 0))
-        if key == glfw.KEY_LEFT:
-            self.attack()
-        if key == glfw.KEY_RIGHT:
-            self.move((0, 1))
+    def push(self, movement):
+        self.move(movement)
 
 
 class Spider(Creature):
@@ -150,16 +147,6 @@ class Spider(Creature):
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_spider,
                          listState=listState)
 
-    def key_handler(self, key):
-        """ Dispatch keyboard events to children with key handler """
-        if key == glfw.KEY_UP:
-            self.move((-1, 0))
-        if key == glfw.KEY_DOWN:
-            self.move((1, 0))
-        if key == glfw.KEY_LEFT:
-            self.move((0, -1))
-        if key == glfw.KEY_RIGHT:
-            self.move((0, 1))
 
 
 class Ore(Node):
@@ -190,25 +177,38 @@ class Barrel(Node):
 
 class Minecart(Node):
     def __init__(self, pos, rail=4):
-        super().__init__()
+        super().__init__(transform=translate(pos[1], -pos[0]+rail-5, .2) @ rotate((0, 0, 1), 90*(4-rail)))
         self.pos = pos
+        self.old_pos = pos
         self.init_angle(rail)
-        self.etat = IDLE
+        self.states = [IDLE]
+
+        self.iterator = 0
+        self.movement = (0, 0)
+        self.angle = []
+        self.rotation_center = []
+
+        self.max_walk = 1#5
+        self.max_rotate = 1#5
+    
+        shader = Shader("shaders/texture.vert", "shaders/texture.frag")
+        self.add(MinecartObj(shader))
 
     def move(self, movement, src_rail, dst_rail):
+        self.old_pos = self.pos
         self.pos = (self.pos[0] + movement[0], self.pos[1] + movement[1])
-        for rail in (src_rail, dst_rail):
+        for rail in (dst_rail, src_rail):
             if rail in (4, 5):
                 self.linear_roll(movement)
             else:
-                self.rotative_roll(movement, rail)
+                self.rotative_roll(movement, rail, rail == dst_rail)
 
     def linear_roll(self, movement):
-        # self.etat = (MOVE, (movement[0]/2, movement[1]/2))
-        while self.etat != IDLE:
-            pass
+        self.movement = movement
+        self.update_state(WALK)
+        
 
-    def rotative_roll(self, movement, rail):
+    def rotative_roll(self, movement, rail, is_dst):
         if movement[0] == -1:
             trigo_rotation = rail in (6, 7)
         if movement[0] == 1:
@@ -218,15 +218,57 @@ class Minecart(Node):
         if movement[1] == 1:
             trigo_rotation = rail in (6, 8)
 
-        rotation_center = ((rail - 6) % 2 - 1 / 2, (rail - 6) // 2 - 1 / 2)
         if trigo_rotation:
-            angle = 45
+            self.angle.append(45)
         else:
-            angle = -45
+            self.angle.append(-45)
 
-        # self.etat = (ROTATE, angle, rotation_center)
-        while self.etat != IDLE:
-            pass
+        if is_dst:
+            rotation_center = (self.pos[0] + (rail - 6) % 2, self.pos[1] + (rail - 6) // 2)
+        else:
+            rotation_center = (self.old_pos[0] + (rail - 6) % 2, self.old_pos[1] + (rail - 6) // 2)
+        self.rotation_center.append(rotation_center)
+
+        self.update_state(ROTATE)
+
+    def draw(self, model=identity(), **other_uniforms):
+        if self.iterator == 0:
+            glfw.set_time(0.0)
+        if self.states[-1] == WALK:
+            self.walk_iterator()
+        elif self.states[-1] == ROTATE:
+            self.rotate_iterator()
+
+        super().draw(model=model, **other_uniforms)
+
+    def walk_iterator(self):
+        if self.iterator < self.max_walk:
+            self.transform = translate(self.movement[1] / self.max_walk / 2, -self.movement[0] / self.max_walk / 2,
+                                           0) @ self.transform
+            self.iterator += 1
+            return
+
+        self.update_state()
+        self.iterator = 0
+
+    def rotate_iterator(self):
+        if self.iterator < self.max_rotate:
+            angle = self.angle[-1]
+            rotation_center = self.rotation_center[-1]
+            self.transform = translate(rotation_center[1], -rotation_center[0], 0) @ rotate(axis=(0., 0., 1.), angle=angle / self.max_rotate) @ translate(-rotation_center[1], rotation_center[0], 0) @ self.transform 
+            self.iterator += 1
+            return
+
+        self.angle.pop()
+        self.rotation_center.pop()
+        self.update_state()
+        self.iterator = 0
+
+    def update_state(self, new_state=None):
+        if new_state is None:
+            self.states.pop()
+        else:
+            self.states.append(new_state)
 
     def init_angle(self, rail):
         if rail == 4:
@@ -240,6 +282,8 @@ class Minecart(Node):
         else:
             self.linear_roll((1, 0))
             self.rotative_roll((-1, 0), rail)
+
+
 
 
 def main():

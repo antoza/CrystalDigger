@@ -142,12 +142,12 @@ def generate_doors(shader, level):
 def generate_rails(shader, level):
     x, y = level.shape
 
-    rails = Node(transform=rotate((0, 0, 1), -90))
+    rails = Node()
 
     for i in range(x):
         for j in range(y):
             if level[i][j] >= 4:
-                rails.add(Rails(shader, level[i][j], transform=translate(i, j, .1)))
+                rails.add(Rails(shader, level[i][j], transform=translate(j, -i-1, .1)))
     return rails
 
 

@@ -4,12 +4,12 @@
 in vec3 w_position, w_normal;
 
 // light spots
-uniform vec4 lights[10];
+uniform vec4 lights[20];
 uniform int nb_lights;
 uniform float d_segt;
 
 // colors for the light gradient
-uniform vec3 light_colors[10];
+uniform vec3 light_colors[20];
 uniform vec3 catmull[10];
 uniform int nb_colors;
 
