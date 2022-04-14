@@ -127,7 +127,7 @@ class Player(Creature):
         listState = {IDLE: 0, WALK: 1, ROTATE: 1, ATTACK: 2}
         super().__init__(shader=shader, ways=ways, pos=pos, transform=transform, base_transform=transform_knight,
                          listState=listState)
-    
+
     def mine(self, movement):
         self.attack()
         self.rotate(movement)
@@ -181,7 +181,7 @@ class Barrel(Node):
 
         self.max_walk = 10
         self.max_wait = 10
-    
+
         shader = Shader("shaders/texture.vert", "shaders/texture.frag")
         self.add(*load(file="src/cube/cube.obj", tex_file="src/cube/cube.png", shader=shader, light_dir=(0,0,1)))
 
@@ -234,7 +234,7 @@ class Minecart(Node):
         self.max_wait = 10
         self.max_walk = 5
         self.max_rotate = 5
-    
+
         shader = Shader("shaders/texture.vert", "shaders/texture.frag")
         self.add(MinecartObj(shader))
 
@@ -250,7 +250,7 @@ class Minecart(Node):
     def linear_roll(self, movement):
         self.movement = movement
         self.update_state(WALK)
-        
+
 
     def rotative_roll(self, movement, rail, is_dst):
         if movement[0] == -1:
@@ -305,7 +305,7 @@ class Minecart(Node):
         if self.iterator < self.max_wait * (len(self.states)-2) + self.max_rotate:
             angle = self.angle[-1]
             rotation_center = self.rotation_center[-1]
-            self.transform = translate(rotation_center[1], -rotation_center[0], 0) @ rotate(axis=(0., 0., 1.), angle=angle / self.max_rotate) @ translate(-rotation_center[1], rotation_center[0], 0) @ self.transform 
+            self.transform = translate(rotation_center[1], -rotation_center[0], 0) @ rotate(axis=(0., 0., 1.), angle=angle / self.max_rotate) @ translate(-rotation_center[1], rotation_center[0], 0) @ self.transform
             self.iterator += 1
             return
 
@@ -319,8 +319,6 @@ class Minecart(Node):
             self.states.pop()
         else:
             self.states.append(new_state)
-
-
 
 
 def main():

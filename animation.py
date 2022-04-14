@@ -11,7 +11,6 @@ from transform import (lerp, quaternion_slerp, quaternion_matrix, translate,
                        scale, identity)
 
 
-# -------------- Keyframing Utilities TP6 ------------------------------------
 class KeyFrames:
     """ Stores keyframe pairs for any value type with interpolation_function"""
     def __init__(self, time_value_pairs, interpolation_function=lerp):
@@ -68,7 +67,6 @@ class KeyFrameControlNode(Node):
         super().draw(primitives=primitives, **uniforms)
 
 
-# -------------- Linear Blend Skinning : TP7 ---------------------------------
 class Skinned:
     """ Skinned mesh decorator, passes bone world transforms to shader """
     def __init__(self, mesh, bone_nodes, bone_offsets):
@@ -85,5 +83,5 @@ class Skinned:
         self.mesh.draw(**uniforms)
 
     def display(self, aff):
-        """ lol """
+        """ modify display attributs for childs """
         self.mesh.display(aff)

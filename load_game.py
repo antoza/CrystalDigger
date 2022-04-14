@@ -103,5 +103,7 @@ def clode_file(file, message):
 
 
 if __name__ == "__main__":
-    solids, entities, door_location = load_from_txt("test.txt")
-    print(solids, entities, door_location)
+    if len(sys.argv) < 2:
+        print("Please enter a .txt game level")
+        sys.exit()
+    print(load_from_txt(sys.argv[1]))

@@ -12,11 +12,13 @@ class Slab(Textured):
     def __init__(self, shader, tex_file):
         super().__init__(*load('src/slab.obj', shader), textures=Texture(tex_file))
 
+
 class Cylinder(Textured):
     """ Very simple cylinder based on provided load function """
 
     def __init__(self, shader, tex_file):
         super().__init__(*load('src/cylinder.obj', shader), textures=Texture(tex_file))
+
 
 def generate_wagon(slab):
     frame = Node()

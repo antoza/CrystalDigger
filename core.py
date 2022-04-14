@@ -158,7 +158,7 @@ class Mesh:
         self.vertex_array.execute(primitives)
 
     def display(self, aff):
-        """ lol """
+        """ modify display attributs to display or undisplay """
         self.displayable = aff
 
 
@@ -186,7 +186,7 @@ class Node:
             child.key_handler(key)
 
     def display(self, aff):
-        """  """
+        """ modify display attributs for childs """
         for child in self.children:
             child.display(aff)
 
@@ -400,7 +400,7 @@ class Viewer(Node):
     def on_key(self, _win, key, _scancode, action, _mods):
         """ 'Q' or 'Escape' quits """
         old = self.mouse
-        if action == glfw.PRESS:# or action == glfw.REPEAT:
+        if action == glfw.PRESS:
             if key == glfw.KEY_ESCAPE:
                 glfw.set_window_should_close(self.win, True)
             if key == glfw.KEY_Q:
@@ -408,24 +408,25 @@ class Viewer(Node):
             if key == glfw.KEY_SPACE:
                 glfw.set_time(0.0)
 
-        if action == glfw.PRESS:# or action == glfw.REPEAT:
-            old = self.mouse
-            if key == glfw.KEY_W:
-                self.trackball.zoom(1, glfw.get_window_size(_win)[1])
-            if key == glfw.KEY_S:
-                self.trackball.drag(old, (old[0] + 1, old[1] +10 ), glfw.get_window_size(_win)[1])
-                #self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
+        # if action == glfw.PRESS:
+        #     old = self.mouse
+        #     if key == glfw.KEY_W:
+        #         self.trackball.zoom(-1, glfw.get_window_size(_win)[1])
+        #     if key == glfw.KEY_S:
+        #         #self.trackball.drag(old, (old[0] + 1, old[1] +10 ), glfw.get_window_size(_win)[1])
+        #         self.trackball.zoom(1, glfw.get_window_size(_win)[1])
 
-        if action == glfw.PRESS :#or action == glfw.REPEAT:
+        if action == glfw.PRESS:
             old = self.mouse
-            if key == glfw.KEY_T:
-                self.mouse = (old[0], old[1] - 10)
+            pas = 50
+            if key == glfw.KEY_W:
+                self.mouse = (old[0], old[1] - pas)
             if key == glfw.KEY_A:
-                self.mouse = (old[0] + 10, old[1])
-            if key == glfw.KEY_Y:
-                self.mouse = (old[0], old[1] + 10)
+                self.mouse = (old[0] + pas, old[1])
+            if key == glfw.KEY_S:
+                self.mouse = (old[0], old[1] + pas)
             if key == glfw.KEY_D:
-                self.mouse = (old[0] - 10, old[1])
+                self.mouse = (old[0] - pas, old[1])
             self.trackball.pan(old, self.mouse)
 
             # call Node.key_handler which calls key_handlers for all drawables
