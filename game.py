@@ -202,6 +202,7 @@ class Game(Viewer):
                         return
                 #the spider can't go anywhere, this poor creature is crushed:'(
                 self.spiders.remove(spider)
+                print(spider)
                 spider.die()
 
     def get_player_connexe(self):
