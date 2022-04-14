@@ -30,7 +30,6 @@ from core import *
 
 class Game(Viewer):
     def __init__(self, solids, entities, door_location, first_move, fps):
-        super().__init__(width=100*len(solids[0]), height=100*len(solids))
         width = 100*len(solids[0])
         height = 100*len(solids)
         size = max(width, height)
@@ -311,7 +310,7 @@ class Game(Viewer):
 
 
 def main(path, fps):
-    solids, entities, door_location = load_from_txt(path)
+    solids, entities, door_location = load_from_txt("GameLevels/"+path)
     if door_location[0] == 0:
         first_move = (1, 0)
     elif door_location[1] == 0:
