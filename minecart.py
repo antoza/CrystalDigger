@@ -45,7 +45,7 @@ def generate_wagon(slab):
     return frame
 
 
-class Minecart(Node):
+class MinecartObj(Node):
 
     def __init__(self, shader, transform=identity()):
         iron = Slab(shader, "src/iron.png")
@@ -97,7 +97,7 @@ def main():
     viewer = Viewer()
     shader = Shader("shaders/texture.vert", "shaders/materialTexture.frag")
 
-    viewer.add(Minecart(shader))
+    viewer.add(MinecartObj(shader))
     viewer.run()
 
 

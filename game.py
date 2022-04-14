@@ -44,21 +44,39 @@ entities = [ [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 #             [0, 1, 0, 0, 0, 0, 0],
 #             [0, 0, 0, 0, 0, 0, 0] ]
 
-solids = [[1, 1, 1, 1, 1],
-            [1, 0, 0, 2, 1],
-            [1, 0, 1, 0, 1],
-            [1, 0, 1, 0, 1],
-            [1, 0, 1, 2, 3],
-            [1, 1, 1, 1, 1]]
+solids = [[1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 2, 0, 1],
+            [1, 0, 9, 4, 4, 5, 1],
+            [1, 0, 8, 7, 8, 5, 1],
+            [1, 0, 0, 8, 4, 6, 1],
+            [1, 0, 0, 1, 2, 0, 3],
+            [1, 1, 1, 1, 1, 1, 1]]
 
-entities = [[0, 0, 0, 0, 0],
-            [0, 4, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0],
-            [0, 4, 0, 0, 0],
-            [0, 0, 0, 0, 0]]
+entities = [[0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 3, 0, 0],
+            [0, 0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0]]
 
-character_pos = (4, 3)
+"""
+111111
+100201
+194401
+151001
+101001
+101203
+111111
+
+000000
+000000
+000300
+000100
+...
+"""
+
+character_pos = (2, 5)
 # Values meaning:
 
 # value: solid
@@ -102,12 +120,13 @@ class Game(Viewer):
         self.waiting = True
         self.iterator = 0
         self.game_over = False
+        self.trackball.zoom(-50, glfw.get_window_size(self.win)[1])
 
     def run(self):
         """ Main render loop for this OpenGL window """
         while not glfw.window_should_close(self.win):
             if not self.waiting:
-                if self.iterator < 30:
+                if self.iterator < 3:#0:
                     self.iterator += 1
                 else:
                     self.iterator = 0
@@ -172,6 +191,18 @@ class Game(Viewer):
                 return
             if self.entity_on(target_pos) != 0 and not isinstance(self.entity_on(target_pos), Spider):
                 return
+            if movement == (1, 0):
+                if not self.solid_on(given_pos) in (5, 7, 9) or not self.solid_on(target_pos) in (5, 6, 8):
+                    return
+            elif movement == (-1, 0):
+                if not self.solid_on(given_pos) in (5, 6, 8) or not self.solid_on(target_pos) in (5, 7, 9):
+                    return
+            elif movement == (0, 1):
+                if not self.solid_on(given_pos) in (4, 8, 9) or not self.solid_on(target_pos) in (4, 6, 7):
+                    return
+            else:
+                if not self.solid_on(given_pos) in (4, 6, 7) or not self.solid_on(target_pos) in (4, 8, 9):
+                    return 
 
             self.change_entity(target_pos, entity)
             self.change_entity(given_pos, 0)
@@ -361,20 +392,18 @@ class Game(Viewer):
             for j in range(len(self.entities[0])):
                 entity = self.entity_on((i,j))
                 if entity != 0:
-                    """if entity == 1:
+                    if entity == 1:
                         self.change_entity((i,j), Ore((i,j)))
                         self.ores += 1
-                    if entity == 2:
-                        self.change_entity((i,j), Barrel((i,j)))
+                    #if entity == 2:
+                    #    self.change_entity((i,j), Barrel((i,j)))
                     if entity == 3:
-                        self.change_entity((i,j), Minecart((i,j)))"""
+                        self.change_entity((i,j), Minecart((i,j), rail=self.solid_on((i,j))))
                     if entity == 4:
                         spider = Spider((i,j))
                         self.spiders.append(spider)
                         self.change_entity((i,j), spider)
-                        self.scene.add(self.entity_on((i,j)))
-                    else:
-                        self.change_entity((i,j), 0)
+                    self.scene.add(self.entity_on((i,j)))
 
 
 def main():
